@@ -1,1 +1,14 @@
 {% extends "base.html" %}
+{% block page_name %}Formulaie d'inscription{% endblock page_name %}
+{% block main_content %}
+<div>
+    <h2>Incrivez-vous</h2>
+    <p>{{ message }}</p>
+    <form method="post">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <button id="go-back">Retourner</button>
+        <button id="signup" type="submit">S'incrire</button>
+    </form>
+</div>
+{% endblock main_content %}

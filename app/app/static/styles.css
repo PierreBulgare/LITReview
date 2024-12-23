@@ -32,3 +32,12 @@ input {
     text-align: center;
     width: 100%;
 }
+
+h1 sub {
+    font-size: 0.5em;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+}

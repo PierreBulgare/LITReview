@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from . import forms
 
@@ -18,7 +18,7 @@ def login_page(request):
 
             if user:
                 login(request, user)
-                message = f"Bonjour, {user.username} !"
+                return redirect('flux')
             else:
                 message = "Identifiants invalides !"
 
@@ -29,4 +29,10 @@ def login_page(request):
             'form': form,
             'message': message
         }
+    )
+
+def signup_page(request):
+    return render(
+        request,
+        'authentication/signup.html'
     )

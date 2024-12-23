@@ -18,8 +18,15 @@ from django.contrib import admin
 from django.urls import path
 
 import authentication.views
+import website.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', authentication.views.login_page, name='login')
+    path('', authentication.views.login_page, name='login'),
+    path('signup/', authentication.views.signup_page, name='signup'),
+    path('flux/', website.views.flux, name='flux'),
+    path('follows/', website.views.follows, name='follows'),
+    path('create-ticket/', website.views.create_ticket, name='create_ticket'),
+    path('create-std-review/', website.views.create_standalone_review, name='create_standalone_review'),
+    path('create-rel-review/', website.views.create_related_review, name='create_related_review')
 ]

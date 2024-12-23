@@ -8,7 +8,17 @@
         {% block header %}
         <header>
             <h1>{% block page_name %}{% endblock page_name %}</h1>
-            <div class="header_content">LIT Review</div>
+            <div class="header_content">
+                LIT Review
+                <nav>
+                    {% if user.is_authenticated %}
+                    <li>Flux</li>
+                    <li>Posts</li>
+                    <li>Abonnements</li>
+                    <li>Se déconnecter</li>
+                    {% endif %}
+                </nav>
+            </div>
         </header>
         {% endblock header %}
         {% block main %}
