@@ -1,9 +1,17 @@
 {% extends "base.html" %}
-{% block content %}
-<p>{{ message }}</p>
-<form method="post">
-    {{ form.as_p }}
-    {% csrf_token %}
-    <button type="submit">Se Connecter</button>
-</form>
-{% endblock content %}
+{% block page_name %}Page d'accueil{% endblock page_name %}
+{% block main_content %}
+<div>
+    <h2>Incrivez-vous maintenant</h2>
+    <button id="sign-up">S'incrire</button>
+</div>
+<div>
+    <h2>Connectez-vous</h2>
+    <p>{{ message }}</p>
+    <form method="post">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <button type="submit">Se Connecter</button>
+    </form>
+</div>
+{% endblock main_content %}
