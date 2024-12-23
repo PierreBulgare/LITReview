@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        {% block header %}
+        <header>
+            {% block page_name %}{% endblock page_name %}
+            <div class="header_content"></div>
+        </header>
+        {% endblock header %}
+        {% block main %}
+        <main>
+            {% block main_content %}{% endblock main_content %}
+        </main>
+        {% endblock main %}
+        {% block footer %}
+        <footer></footer>
+        {% endblock footer %}
+    </body>
+</html>
