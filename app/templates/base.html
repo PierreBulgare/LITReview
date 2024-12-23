@@ -1,12 +1,14 @@
+{% load static %}
 <html>
     <head>
         <title></title>
+        <link rel="stylesheet" href="{% static 'styles.css' %}">
     </head>
     <body>
         {% block header %}
         <header>
-            {% block page_name %}{% endblock page_name %}
-            <div class="header_content"></div>
+            <h1>{% block page_name %}{% endblock page_name %}</h1>
+            <div class="header_content">LIT Review</div>
         </header>
         {% endblock header %}
         {% block main %}

@@ -1,0 +1,34 @@
+h1 {
+    text-align: center;
+}
+
+.header_content, main {
+    border: 1px solid black;
+    text-align: center;
+    padding: 10px;
+}
+
+main {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    border-top: 0px;
+}
+
+.main_content div {
+    flex: 1;
+}
+
+button {
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+input {
+    border: 1px solid black;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+}
