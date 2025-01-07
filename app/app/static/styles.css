@@ -1,11 +1,32 @@
+* {
+    color: black;
+}
+
+a {
+    text-decoration: none;
+}
+
 h1 {
     text-align: center;
 }
 
 .header_content, main {
     border: 1px solid black;
-    text-align: center;
     padding: 10px;
+}
+
+.header_content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 20px;
+}
+
+.header_content h2 {
+    left: 50%;
+    position: absolute;
 }
 
 main {
@@ -15,15 +36,24 @@ main {
     border-top: 0px;
 }
 
-.main_content div {
-    flex: 1;
+main > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
-button {
+form {
+    width: 50%;
+}
+
+.button {
     border: 1px solid black;
     border-radius: 5px;
     padding: 10px 20px;
     cursor: pointer;
+    background-color: white;
 }
 
 input {
@@ -40,4 +70,13 @@ h1 sub {
 nav {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    list-style-type: none;
+    position: absolute;
+    right: 1%;
+}
+
+li {
+    cursor: pointer;
 }

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block page_name %}Formulaie d'inscription{% endblock page_name %}
+{% block page_name %}Formulaire d'inscription{% endblock page_name %}
 {% block main_content %}
 <div>
     <h2>Incrivez-vous</h2>
@@ -7,8 +7,8 @@
     <form method="post">
         {{ form.as_p }}
         {% csrf_token %}
-        <button id="go-back">Retourner</button>
-        <button id="signup" type="submit">S'incrire</button>
+        <button type="button" onclick="window.location.href='{% url 'login' %}'" class="button">Retourner</button>
+        <button id="signup" type="submit" class="button">S'incrire</button>
     </form>
 </div>
 {% endblock main_content %}

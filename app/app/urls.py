@@ -23,6 +23,7 @@ import website.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', authentication.views.login_page, name='login'),
+    path('logout/', authentication.views.logout_page, name='logout'),
     path('signup/', authentication.views.signup_page, name='signup'),
     path('flux/', website.views.flux, name='flux'),
     path('follows/', website.views.follows, name='follows'),

@@ -3,7 +3,7 @@
 {% block main_content %}
 <div>
     <h2>Incrivez-vous maintenant</h2>
-    <button id="sign-up">S'incrire</button>
+    <a href="{% url 'signup' %}" class="button">S'incrire</a>
 </div>
 <div>
     <h2>Connectez-vous</h2>
@@ -11,7 +11,7 @@
     <form method="post">
         {{ form.as_p }}
         {% csrf_token %}
-        <button type="submit">Se Connecter</button>
+        <button type="submit" class="button">Se Connecter</button>
     </form>
 </div>
 {% endblock main_content %}

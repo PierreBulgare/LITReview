@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+
+from . import forms
 
 @login_required
 def flux(request):
@@ -10,9 +13,28 @@ def flux(request):
 
 @login_required
 def follows(request):
+    form = forms.FollowUserForm()
+    message = ''
+
+    if request.method == 'POST':
+        form = forms.FollowUserForm(request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data['username']
+
+            try:
+                user = User.objects.get(username=username)
+                request.user.profile.follows.add(user.profile)
+                message = "Utilisateur suivi avec succès !"
+            except User.DoesNotExist:
+                message = "Cet utilisateur n'existe pas !"
     return render(
         request,
-        'website/follows.html'
+        'website/follows.html',
+        context={
+            'form': form,
+            'message': message
+        }
     )
 
 @login_required

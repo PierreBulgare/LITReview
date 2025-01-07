@@ -1,4 +1,12 @@
 {% extends "base.html" %}
 {% block page_name %}Onglet d'abonnements{% endblock page_name %}
 {% block main_content %}
+<div>
+    <p>Suivre d'autres utilisateurs</p>
+    <form method="post">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <button type="submit" class="button">Suivre</button>
+    </form>
+</div>
 {% endblock main_content%}
