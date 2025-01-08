@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from .models import Ticket
 
 from . import forms
 
@@ -45,9 +46,42 @@ def follows(request):
 
 @login_required
 def create_ticket(request):
+    form = forms.TicketForm()
+    message = ''
+
+    if request.method == 'POST':
+        form = forms.TicketForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.user = request.user
+            ticket.save()
+            
+            # Crée un ticket
+            message = "Ticket créé avec succès !"
+            return redirect('posts')
+    else:
+        form = forms.TicketForm()
+
     return render(
         request,
-        'website/create-ticket.html'
+        'website/create-ticket.html',
+        context={
+            'form': form,
+            'message': message
+        }
+    )
+
+@login_required
+def posts(request):
+    user_posts = Ticket.objects.filter(user=request.user).order_by('-time_created')
+
+    return render(
+        request,
+        'website/posts.html',
+        context={
+            'posts': user_posts
+        }
     )
 
 @login_required

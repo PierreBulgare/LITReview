@@ -16,7 +16,7 @@
                 <nav>
                     {% if user.is_authenticated %}
                     <li><a href="{% url 'flux' %}">Flux</a></li>
-                    <li><a href="{% url 'create_ticket' %}">Posts</a></li>
+                    <li><a href="{% url 'posts' %}">Posts</a></li>
                     <li><a href="{% url 'follows' %}">Abonnements</a></li>
                     <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
                     {% endif %}

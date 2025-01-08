@@ -6,6 +6,11 @@ a {
     text-decoration: none;
 }
 
+p {
+    margin: 0;
+    padding: 5px 0px;
+}
+
 h1 {
     text-align: center;
 }
@@ -105,4 +110,55 @@ li {
 .follows-list button {
     position: absolute;
     right: 1%;
+}
+
+textarea {
+    width: 100%;
+    height: 200px;
+}
+
+.posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
+}
+
+.post {
+    border: 1px solid black;
+    width: 60%;
+    padding: 5px;
+}
+
+.ticket-image-description {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.ticket-title {
+    font-size: 150%;
+    font-weight: bold;
+}
+
+.description::first-letter {
+    font-size: 150%;
+    font-weight: bold;
+}
+
+.ticket-image {
+    max-width: 200px;
+}
+
+.ticket-date {
+    text-align: right;
+    font-style: italic;
+}
+
+.ticket-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-self: flex-end;
 }

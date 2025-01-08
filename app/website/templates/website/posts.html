@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block page_name %}Voir vos propres posts{% endblock page_name %}
+{% block main_content %}
+<div>
+    <h2>Vos posts</h2>
+    <div class="posts-list">
+        {% for post in posts %}
+            <div class="post">
+                <p>Vous avez publié un ticket</p>
+                <p class="ticket-date">{{ post.time_created|date:"H:i, j F Y" }}</p>
+                <p class="ticket-title">{{ post.title }}</p>
+                <p class="ticket-image-description">
+                    <img src="{{ post.image.url }}" class="ticket-image">
+                    <span class="description">{{ post.description }}</span>
+                </p>
+                <p class="ticket-buttons">
+                    <button class="button">Modifier</button>
+                    <button class="button">Supprimer</button>
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock main_content %}
