@@ -80,3 +80,29 @@ nav {
 li {
     cursor: pointer;
 }
+
+.follow-form {
+    display: flex !important;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.follows-list {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.follows-list p {
+    border: 1px solid black;
+    padding: 5px;
+    width: 40%;
+}
+
+.follows-list button {
+    position: absolute;
+    right: 1%;
+}

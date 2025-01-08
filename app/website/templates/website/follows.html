@@ -3,10 +3,23 @@
 {% block main_content %}
 <div>
     <p>Suivre d'autres utilisateurs</p>
-    <form method="post">
+    <p>{{ message }}</p>
+    <form method="post" class="follow-form">
         {{ form.as_p }}
         {% csrf_token %}
-        <button type="submit" class="button">Suivre</button>
+        <button type="submit" class="button follow-button">Suivre</button>
     </form>
+    <p>Abonnements</p>
+    <div class="follows-list">
+        {% for followed_user in followed_users %}
+            <p>{{ followed_user }}<button>Désabonner</button></p>
+        {% endfor %}
+    </div>
+    <p>Abonnés</p>
+    <div class="follows-list">
+        {% for follower in followers %}
+            <p>{{ follower }}</p>
+        {% endfor %}
+    </div>
 </div>
-{% endblock main_content%}
+{% endblock main_content %}

@@ -1,6 +1,3 @@
 # Dossiers
 env/
 __pycache__/
-
-# BDD
-db.sqlite3

@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect
 from . import forms
 
 def login_page(request):
+    if request.user.is_authenticated:
+        return redirect('flux')
     form = forms.LoginForm()
     message = ''
 

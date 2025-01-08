@@ -15,6 +15,8 @@ def flux(request):
 def follows(request):
     form = forms.FollowUserForm()
     message = ''
+    followed_users = request.user.profile.follows.all()
+    followers = request.user.profile.followed_by.all()
 
     if request.method == 'POST':
         form = forms.FollowUserForm(request.POST)
@@ -23,17 +25,21 @@ def follows(request):
             username = form.cleaned_data['username']
 
             try:
-                user = User.objects.get(username=username)
-                request.user.profile.follows.add(user.profile)
+                user_to_follow = User.objects.get(username=username)
+                request.user.profile.follows.add(user_to_follow.profile)
                 message = "Utilisateur suivi avec succès !"
             except User.DoesNotExist:
                 message = "Cet utilisateur n'existe pas !"
+            except AttributeError:
+                message = "Erreur de configuration du profil utilisateur."
     return render(
         request,
         'website/follows.html',
         context={
             'form': form,
-            'message': message
+            'message': message,
+            'followed_users': followed_users,
+            'followers': followers
         }
     )
 
