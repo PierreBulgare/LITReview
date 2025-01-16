@@ -5,8 +5,10 @@
     <p>Créer un ticket</p>
     <p>{{ message }}</p>
     <form method="post" enctype="multipart/form-data">
-        {{ form.as_p }}
         {% csrf_token %}
+        {{ form.as_p }}
+
         <button type="submit" class="button follow-button">Créer</button>
     </form>
+</div>
 {% endblock main_content%}

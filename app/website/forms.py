@@ -1,5 +1,5 @@
 from django import forms
-from .models import Ticket
+from .models import Ticket, Review
 
 class FollowUserForm(forms.Form):
     username = forms.CharField(
@@ -22,7 +22,8 @@ class TicketForm(forms.ModelForm):
         widget=forms.TextInput()
     )
     description = forms.CharField(
-        widget=forms.Textarea()
+        widget=forms.Textarea(),
+        required=False
     )
     image = forms.ImageField(
         required=False
@@ -33,5 +34,35 @@ class TicketForm(forms.ModelForm):
         for field_name, field in self.fields.items():
             if field_name == 'title':
                 field.label = 'Titre'
+            else:
+                field.label = ''
+
+class ReviewForm(forms.Form):
+    class Meta:
+        model = Review
+        fields = ['headline', 'description', 'rating']
+
+    headline = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput()
+    )
+    rating = forms.IntegerField(
+        min_value=0,
+        max_value=5,
+        widget=forms.NumberInput()
+    )
+    comment = forms.CharField(      
+        widget=forms.Textarea()
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if field_name == 'title':
+                field.label = 'Titre'
+            elif field_name == 'rating':
+                field.label = 'Note'
+            elif field_name == 'comment':
+                field.label = 'Commentaire'
             else:
                 field.label = ''

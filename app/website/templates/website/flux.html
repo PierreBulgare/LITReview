@@ -2,9 +2,21 @@
 {% block page_name %}Flux{% endblock page_name %}
 {% block main_content %}
 <div>
-    <div>
-<button type="button" onclick="window.location.href='{% url 'create_ticket' %}'" class="button">Demander une critique</button>
-<button type="button" onclick="window.location.href='{% url 'create_standalone_review' %}'" class="button">Créer une critique</button>
+    <p>
+        <button type="button" onclick="window.location.href='{% url 'create_ticket' %}'" class="button">Demander une critique</button>
+        <button type="button" onclick="window.location.href='{% url 'create_standalone_review' %}'" class="button">Créer une critique</button>
+    </p>
+    <div class="posts-list">
+        {% for ticket in tickets %}
+        <div class="post">
+            <p><b>{{ ticket.user.username }}</b> a demandé une critique</p>
+            <p class="ticket-date">{{ ticket.time_created|date:"H:i, j F Y" }}</p>
+            <p class="ticket-title">{{ ticket.title }}</p>
+            <p class="ticket-buttons">
+                <button id="{{ ticket.id }}" class="button">Créer une critique</button>
+            </p>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock main_content%}

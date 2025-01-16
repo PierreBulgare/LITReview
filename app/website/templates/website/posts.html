@@ -10,12 +10,16 @@
                 <p class="ticket-date">{{ post.time_created|date:"H:i, j F Y" }}</p>
                 <p class="ticket-title">{{ post.title }}</p>
                 <p class="ticket-image-description">
-                    <img src="{{ post.image.url }}" class="ticket-image">
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="Image de {{ post.title }}" class="ticket-image">
+                    {% else %}
+                        <p>Aucune image disponible.</p>
+                    {% endif %}
                     <span class="description">{{ post.description }}</span>
                 </p>
                 <p class="ticket-buttons">
-                    <button class="button">Modifier</button>
-                    <button class="button">Supprimer</button>
+                    <a href="{% url 'edit_ticket' post.id %}" class="button">Modifier</a>
+                    <a href="{% url 'delete_ticket' post.id %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
                 </p>
             </div>
         {% endfor %}
