@@ -7,8 +7,10 @@
     <form method="post">
         {{ form.as_p }}
         {% csrf_token %}
-        <button type="button" onclick="window.location.href='{% url 'login' %}'" class="button">Retourner</button>
-        <button id="signup" type="submit" class="button">S'incrire</button>
+        <div class="button-container">
+            <button type="button" onclick="window.location.href='{% url 'login' %}'" class="button">Retourner</button>
+            <button id="signup" type="submit" class="button">S'incrire</button>
+        </div>
     </form>
 </div>
 {% endblock main_content %}

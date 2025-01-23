@@ -12,10 +12,17 @@
     </form>
     <div id="users-suggestions-list" class="users-suggestions-list hidden">
     </div>
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     <h2>Abonnements</h2>
     <div class="follows-list">
         {% for followed_user in followed_users %}
-            <p>👤 {{ followed_user }}<button>Désabonner</button></p>
+            <p>👤 {{ followed_user }}<a href="../unfollow/user_{{ followed_user.user_id }}/" class="button">❌ Désabonner</a></p>
         {% endfor %}
     </div>
     <h2>Abonnés</h2>

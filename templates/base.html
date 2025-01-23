@@ -11,10 +11,9 @@
     <body>
         {% block header %}
         <header>
-            <h1>{% block page_name %}{% endblock page_name %}</h1>
             <div class="header_content">
                 {% if user.is_authenticated %}
-                <span>Connecté en tant que <b>{{ user.username }}</b></span>
+                <span class="bold-element">👤 {{ user.username }}</span>
                 {% endif %}
                 <h2>LIT Review</h2>
                 <nav>
@@ -28,6 +27,7 @@
                     </ul>
                 </nav>
             </div>
+            <h1>{% block page_name %}{% endblock page_name %}</h1>
         </header>
         {% endblock header %}
         {% block main %}

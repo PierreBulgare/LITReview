@@ -27,6 +27,7 @@ h1 {
 .header_content, main {
     border: 1px solid black;
     padding: 10px;
+    border-radius: 10px;
 }
 
 .header_content {
@@ -47,7 +48,6 @@ main {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    border-top: 0px;
 }
 
 main > div {
@@ -59,12 +59,23 @@ main > div {
 }
 
 form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     width: 50%;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
 }
 
 .button {
     border: 1px solid black;
-    border-radius: 5px;
+    border-radius: 10px;
     padding: 10px 20px;
     cursor: pointer;
     background-color: white;
@@ -72,6 +83,7 @@ form {
 
 input {
     border: 1px solid black;
+    border-radius: 10px;
     padding: 10px;
     text-align: center;
     width: 100%;
@@ -135,13 +147,21 @@ li {
 .follows-list p {
     display: flex;
     flex-direction: row;
+    align-items: center;
     border: 1px solid black;
     padding: 5px;
     width: 40%;
+    height: 40px;
+    position: relative;
 }
 
-.follows-list p button {
-    margin-left: auto;
+.follows-list a.button {
+    position: absolute;
+    right: 5px;
+    border: none;
+    border-radius: 0;
+    border-left: 1px solid black;
+    height: auto;
 }
 
 textarea {

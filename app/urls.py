@@ -29,6 +29,7 @@ urlpatterns = [
     path('signup/', authentication.views.signup_page, name='signup'),
     path('flux/', website.views.flux, name='flux'),
     path('follows/', website.views.follows, name='follows'),
+    path('unfollow/<str:user_id>/', website.views.unfollow, name='unfollow'),
     path('search-users/', website.views.search_users, name='search_users'),
     path('posts/', website.views.posts, name='posts'),
     path('create-ticket/', website.views.create_ticket, name='create_ticket'),

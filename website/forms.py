@@ -40,7 +40,7 @@ class TicketForm(forms.ModelForm):
         required=False
     )
     image = forms.ImageField(
-        required=False
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
@@ -48,6 +48,10 @@ class TicketForm(forms.ModelForm):
         for field_name, field in self.fields.items():
             if field_name == "title":
                 field.label = "Titre"
+            elif field_name == "description":
+                field.label = "Description"
+            elif field_name == "image":
+                field.label = "Image"
             else:
                 field.label = ""
 

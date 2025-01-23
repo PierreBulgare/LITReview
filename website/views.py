@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.db.models import Value, BooleanField, F
@@ -65,8 +66,16 @@ def follows(request):
 
             try:
                 user_to_follow = User.objects.get(username=username)
-                request.user.profile.follows.add(user_to_follow.profile)
-                message = "Utilisateur suivi avec succès !"
+                print(user_to_follow)
+                print(followed_users[0].user)
+                if user_to_follow == request.user:
+                    message = "Vous ne pouvez pas vous suivre vous-même !"
+                elif user_to_follow.profile in followed_users:
+                    message = "Vous suivez déjà cet utilisateur !"
+                else:
+                    request.user.profile.follows.add(user_to_follow.profile)
+                    message = "Utilisateur suivi avec succès !"
+                    followed_users = request.user.profile.follows.all()
             except User.DoesNotExist:
                 message = "Cet utilisateur n'existe pas !"
             except AttributeError:
@@ -83,10 +92,24 @@ def follows(request):
     )
 
 @login_required
+def unfollow(request, user_id):
+    if user_id == str(request.user.id):
+        messages.error(request, "Vous ne pouvez pas vous désabonner de vous-même !")
+        return redirect("follows")
+    try:
+        user_id = int(user_id.split("_")[-1])
+        user_to_unfollow = User.objects.get(id=user_id)
+        request.user.profile.follows.remove(user_to_unfollow.profile)
+    except User.DoesNotExist:
+        messages.error(request, "Cet utilisateur n'existe pas !")
+
+    return redirect("follows")
+
+@login_required
 def search_users(request):
     if request.method == "GET":
         username = request.GET.get('search', '')
-        users = User.objects.filter(username__startswith=username)
+        users = User.objects.filter(username__startswith=username).exclude(id=request.user.id)
         return JsonResponse(
             {"users": list(users.values("username"))}, safe=False)
     return JsonResponse({}, safe=False)
