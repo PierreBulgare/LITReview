@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block page_name %}Créer un ticket{% endblock page_name %}
+{% block main_content %}
+<div>
+    <p>Créer un ticket</p>
+    <p>{{ message }}</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="button follow-button">Créer</button>
+    </form>
+</div>
+{% endblock main_content%}

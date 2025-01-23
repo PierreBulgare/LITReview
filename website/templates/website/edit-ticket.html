@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block page_name %}Modifier un ticket{% endblock page_name %}
+{% block main_content %}<div>
+    <p>Modifier un ticket</p>
+    <p>{{ message }}</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.title }}
+        {{ form.description }}
+
+        {% if ticket.image %}
+            <div style="margin-bottom: 10px;">
+                <p>Image actuelle :</p>
+                <img src="{{ ticket.image.url }}" alt="Image actuelle" style="max-width: 200px; max-height: 200px;">
+            </div>
+        {% endif %}
+
+        {{ form.image }}
+        <button type="submit" class="button">Valider</button>
+        <button class="button"><a href="{% url 'posts' %}">Annuler</a></button>
+    </form>
+{% endblock main_content%}

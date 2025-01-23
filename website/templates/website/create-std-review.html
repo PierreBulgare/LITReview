@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block page_name %}Créer une critique<br><sub>(pas en réponse à un ticket)</sub>{% endblock page_name %}
+{% block main_content %}
+<div>
+    <p>{{ message }}</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <p>Livre / Article</p>
+        {{ ticket_form.as_p }}
+        
+        <p>Critique</p>
+        {{ review_form.as_p }}
+
+        <button type="submit" class="button follow-button">Créer</button>
+    </form>
+</div>
+{% endblock main_content%}
