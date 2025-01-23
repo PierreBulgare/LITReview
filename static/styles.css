@@ -39,9 +39,12 @@ h1 {
     padding: 20px;
 }
 
-.header_content h2 {
-    left: 50%;
-    position: absolute;
+.header_content h1 {
+    margin: 0 auto;
+}
+
+.header_content li:hover {
+    font-weight: bold;
 }
 
 main {

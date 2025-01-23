@@ -17,7 +17,7 @@
                      vous avez demandé une critique
                     {% else %}
                     <span class="bold-element">
-                        {{ post.user.username }}
+                        👤 {{ post.user.username }}
                     </span> a demandé une critique
                     {% endif %}
                 {% else %}
@@ -25,7 +25,7 @@
                      vous avez publié une critique
                     {% else %}
                     <span class="bold-element">
-                        {{ post.user.username }}
+                        👤 {{ post.user.username }}
                     </span> a publié une critique
                     {% endif %}
                 {% endif %}
@@ -57,8 +57,8 @@
                 {% endif %}
             {% else %}
             <div class="post">
-                <p>Ticket - {{ post.ticket.id }}</p>
-                <span class="bold-element">{{ post.ticket.user.username }}</span>
+                <p>Ticket <b>{{ post.ticket.id }}</b></p>
+                <span class="bold-element">👤 {{ post.ticket.user.username }}</span>
                 <p class="ticket-title">{{ post.ticket.title }}</p>
                 {% if post.ticket.description %}
                     <p class="ticket-description">{{ post.ticket.description }}</p>

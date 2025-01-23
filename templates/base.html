@@ -15,14 +15,14 @@
                 {% if user.is_authenticated %}
                 <span class="bold-element">👤 {{ user.username }}</span>
                 {% endif %}
-                <h2>LIT Review</h2>
+                <h1>📖 LIT Review 📖</h1>
                 <nav>
                     <ul>
                         {% if user.is_authenticated %}
-                        <li><a href="{% url 'flux' %}">Flux</a></li>
-                        <li><a href="{% url 'posts' %}">Posts</a></li>
-                        <li><a href="{% url 'follows' %}">Abonnements</a></li>
-                        <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
+                        <li><a href="{% url 'flux' %}">📰 Flux</a></li>
+                        <li><a href="{% url 'posts' %}">📃 Posts</a></li>
+                        <li><a href="{% url 'follows' %}">👥 Abonnements</a></li>
+                        <li><a href="{% url 'logout' %}">❌ Se déconnecter</a></li>
                         {% endif %}
                     </ul>
                 </nav>
