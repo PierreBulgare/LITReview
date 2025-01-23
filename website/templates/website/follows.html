@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %} | Abonnements{% endblock title %}
 {% block page_name %}Onglet d'abonnements{% endblock page_name %}
 {% block main_content %}
 <div>
@@ -9,16 +10,18 @@
         {% csrf_token %}
         <button type="submit" class="button follow-button">Suivre</button>
     </form>
-    <p>Abonnements</p>
+    <div id="users-suggestions-list" class="users-suggestions-list hidden">
+    </div>
+    <h2>Abonnements</h2>
     <div class="follows-list">
         {% for followed_user in followed_users %}
-            <p>{{ followed_user }}<button>Désabonner</button></p>
+            <p>👤 {{ followed_user }}<button>Désabonner</button></p>
         {% endfor %}
     </div>
-    <p>Abonnés</p>
+    <h2>Abonnés</h2>
     <div class="follows-list">
         {% for follower in followers %}
-            <p>{{ follower }}</p>
+            <p>👤 {{ follower }}</p>
         {% endfor %}
     </div>
 </div>

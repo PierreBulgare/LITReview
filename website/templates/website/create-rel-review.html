@@ -1,4 +1,26 @@
 {% extends "base.html" %}
+{% block title %} | Créer une critique{% endblock title %}
 {% block page_name %}Créer une critique<br><sub>(en réponse à un ticket)</sub>{% endblock page_name %}
 {% block main_content %}
+<div class="ticket-preview">
+    <p>Vous êtes en train de poster en réponse à</p>
+    <div class="post">
+        <p><b>{{ ticket.user.username }}</b> a demandé une critique</p>
+        <p class="ticket-date">{{ ticket.time_created|date:"H:i, j F Y" }}</p>
+        <p class="ticket-title">{{ ticket.title }}</p>
+        {% if ticket.description %}
+            <p class="ticket-description">{{ ticket.description }}</p>
+        {% endif %}
+        {% if ticket.image %}
+            <img src="{{ ticket.image.url }}" alt="Couverture du livre" title="{{ ticket.title }}" class="ticket-image">
+        {% endif %}
+    </div>
+</div>
+<p>{{ message }}</p>
+<form method="post">
+    {% csrf_token %}
+    {{ review_form.as_p }}
+
+    <button type="submit" class="button follow-button">Créer</button>
+</form>
 {% endblock main_content%}

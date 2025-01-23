@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load custom_filters %}
+{% block title %} | Flux{% endblock title %}
 {% block page_name %}Flux{% endblock page_name %}
 {% block main_content %}
 <div>
@@ -7,14 +9,65 @@
         <button type="button" onclick="window.location.href='{% url 'create_standalone_review' %}'" class="button">Créer une critique</button>
     </p>
     <div class="posts-list">
-        {% for ticket in tickets %}
+        {% for post in posts %}
         <div class="post">
-            <p><b>{{ ticket.user.username }}</b> a demandé une critique</p>
-            <p class="ticket-date">{{ ticket.time_created|date:"H:i, j F Y" }}</p>
-            <p class="ticket-title">{{ ticket.title }}</p>
-            <p class="ticket-buttons">
-                <button id="{{ ticket.id }}" class="button">Créer une critique</button>
+            <p>
+                {% if post.is_ticket %}
+                    {% if post.user.username == user.username %}
+                     vous avez demandé une critique
+                    {% else %}
+                    <span class="bold-element">
+                        {{ post.user.username }}
+                    </span> a demandé une critique
+                    {% endif %}
+                {% else %}
+                    {% if post.user.username == user.username%}
+                     vous avez publié une critique
+                    {% else %}
+                    <span class="bold-element">
+                        {{ post.user.username }}
+                    </span> a publié une critique
+                    {% endif %}
+                {% endif %}
             </p>
+            <p class="ticket-date">{{ post.time_created|date:"H:i, j F Y" }}</p>
+            <p class="ticket-title">
+                {{ post.title }}
+                {% if not post.is_ticket %}
+                    - 
+                    {% for rate in post.rating|iteration %}
+                        ★
+                    {% endfor %}
+                    {% for rate in post.rating|remaining_stars %}
+                        ☆
+                    {% endfor %}
+                {% endif %}
+            </p>
+            {% if post.description %}
+                <p class="ticket-description">{{ post.description }}</p>
+            {% endif %}
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="Couverture du livre" title="{{ post.title }}" class="ticket-image">
+            {% endif %}
+            {% if post.is_ticket%}
+                {% if post.user.username != user.username and post.id not in reviewed_tickets %}
+                    <p class="ticket-buttons">
+                        <a href="{% url 'create_related_review' post.id %}" class="answer-button button">Créer une critique</a>
+                    </p>
+                {% endif %}
+            {% else %}
+            <div class="post">
+                <p>Ticket - {{ post.ticket.id }}</p>
+                <span class="bold-element">{{ post.ticket.user.username }}</span>
+                <p class="ticket-title">{{ post.ticket.title }}</p>
+                {% if post.ticket.description %}
+                    <p class="ticket-description">{{ post.ticket.description }}</p>
+                {% endif %}
+                {% if post.ticket.image %}
+                    <img src="{{ post.ticket.image.url }}" alt="Couverture du livre" title="{{ post.ticket.title }}" class="ticket-image">
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
     </div>

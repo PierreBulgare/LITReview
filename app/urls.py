@@ -29,12 +29,13 @@ urlpatterns = [
     path('signup/', authentication.views.signup_page, name='signup'),
     path('flux/', website.views.flux, name='flux'),
     path('follows/', website.views.follows, name='follows'),
+    path('search-users/', website.views.search_users, name='search_users'),
     path('posts/', website.views.posts, name='posts'),
     path('create-ticket/', website.views.create_ticket, name='create_ticket'),
     path('edit-ticket/<int:ticket_id>/', website.views.edit_ticket, name='edit_ticket'),
     path('delete-ticket/<int:ticket_id>/', website.views.delete_ticket, name='delete_ticket'),
     path('create-std-review/', website.views.create_standalone_review, name='create_standalone_review'),
-    path('create-rel-review/', website.views.create_related_review, name='create_related_review')
+    path('create-rel-review/<int:ticket_id>/', website.views.create_related_review, name='create_related_review')
 ]
 
 if settings.DEBUG:

@@ -1,33 +1,67 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.db.models import Value, BooleanField, F
 from .models import Ticket, Review
+from django.http import JsonResponse
+from itertools import chain
 
 from . import forms
 
 @login_required
 def flux(request):
-    tickets = Ticket.objects.filter(user__profile__in=request.user.profile.follows.all()).order_by('-time_created')
+    # Tickets et criqtiues de l'utilisateur connecté
+    user_tickets = Ticket.objects.filter(user=request.user).annotate(
+        is_ticket=Value(True, output_field=BooleanField())
+    ).order_by("-time_created")
+
+    user_reviews = Review.objects.filter(user=request.user).annotate(
+        is_ticket=Value(False, output_field=BooleanField()),
+        title=F("headline")  # Renommer "headline" en "title"
+    ).order_by("-time_created")
+
+    # Tickets et critiques des utilisateurs suivis
+    followed_profiles = request.user.profile.follows.all()
+    other_tickets = Ticket.objects.filter(user__profile__in=followed_profiles).annotate(
+        is_ticket=Value(True, output_field=BooleanField())
+    ).order_by("-time_created")
+
+    other_reviews = Review.objects.filter(user__profile__in=followed_profiles).annotate(
+        is_ticket=Value(False, output_field=BooleanField()),
+        title=F("headline")
+    ).order_by("-time_created")
+
+    # Tickets déjà critiqués par l'utilisateur
+    reviewed_tickets = Review.objects.filter(user=request.user).values_list('ticket_id', flat=True)
+
+    # Combinaison des tickets et critiques triés par date de création
+    posts = sorted(
+        chain(user_tickets, user_reviews, other_tickets, other_reviews),
+        key=lambda x: x.time_created,
+        reverse=True
+    )
+
     return render(
         request,
-        'website/flux.html',
+        "website/flux.html",
         context={
-            'tickets': tickets
-            }
+            "posts": posts,
+            "reviewed_tickets": reviewed_tickets
+        }
     )
 
 @login_required
 def follows(request):
     form = forms.FollowUserForm()
-    message = ''
+    message = ""
     followed_users = request.user.profile.follows.all()
     followers = request.user.profile.followed_by.all()
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = forms.FollowUserForm(request.POST)
 
         if form.is_valid():
-            username = form.cleaned_data['username']
+            username = form.cleaned_data["username"]
 
             try:
                 user_to_follow = User.objects.get(username=username)
@@ -39,21 +73,30 @@ def follows(request):
                 message = "Erreur de configuration du profil utilisateur."
     return render(
         request,
-        'website/follows.html',
+        "website/follows.html",
         context={
-            'form': form,
-            'message': message,
-            'followed_users': followed_users,
-            'followers': followers
+            "form": form,
+            "message": message,
+            "followed_users": followed_users,
+            "followers": followers
         }
     )
 
 @login_required
+def search_users(request):
+    if request.method == "GET":
+        username = request.GET.get('search', '')
+        users = User.objects.filter(username__startswith=username)
+        return JsonResponse(
+            {"users": list(users.values("username"))}, safe=False)
+    return JsonResponse({}, safe=False)
+
+@login_required
 def create_ticket(request):
     form = forms.TicketForm()
-    message = ''
+    message = ""
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = forms.TicketForm(request.POST, request.FILES)
 
         if form.is_valid():
@@ -63,16 +106,16 @@ def create_ticket(request):
             
             # Crée un ticket
             message = "Ticket créé avec succès !"
-            return redirect('posts')
+            return redirect("posts")
     else:
         form = forms.TicketForm()
 
     return render(
         request,
-        'website/create-ticket.html',
+        "website/create-ticket.html",
         context={
-            'form': form,
-            'message': message
+            "form": form,
+            "message": message
         }
     )
 
@@ -81,27 +124,27 @@ def edit_ticket(request, ticket_id):
     try:
         ticket = Ticket.objects.get(id=ticket_id, user=request.user)
     except Ticket.DoesNotExist:
-        return redirect('posts')
+        return redirect("posts")
     
-    message = ''
+    message = ""
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = forms.TicketForm(request.POST, request.FILES, instance=ticket)
 
         if form.is_valid():
             form.save()
             message = "Post modifié avec succès !"
-            return redirect('posts')
+            return redirect("posts")
     else:
         form = forms.TicketForm(instance=ticket)
 
     return render(
         request,
-        'website/edit-ticket.html',
+        "website/edit-ticket.html",
         context={
-            'form': form,
-            'message': message,
-            'ticket': ticket
+            "form": form,
+            "message": message,
+            "ticket": ticket
         }
     )
 
@@ -114,18 +157,28 @@ def delete_ticket(request, ticket_id):
     except Ticket.DoesNotExist:
         message = "Ce ticket n'existe pas ou vous n'avez pas la permission de le supprimer."
 
-    return redirect('posts')
+    return redirect("posts")
 
 
 @login_required
 def posts(request):
-    user_posts = Ticket.objects.filter(user=request.user).order_by('-time_created')
+    user_tickets = Ticket.objects.filter(user=request.user).order_by("-time_created")
+    user_reviews = Review.objects.filter(user=request.user).order_by("-time_created")
+    posts = list(user_tickets) + list(user_reviews)
+
+    for ticket in user_tickets:
+        ticket.is_ticket = True
+    for review in user_reviews:
+        review.is_ticket = False
+        review.title = review.headline
+        
+    user_posts = sorted(posts, key=lambda x: x.time_created, reverse=True)
 
     return render(
         request,
-        'website/posts.html',
+        "website/posts.html",
         context={
-            'posts': user_posts
+            "posts": user_posts
         }
     )
 
@@ -133,9 +186,9 @@ def posts(request):
 def create_standalone_review(request):
     ticket_form = forms.TicketForm()
     review_form = forms.ReviewForm()
-    message = ''
+    message = ""
 
-    if request.method == 'POST':
+    if request.method == "POST":
         ticket_form = forms.TicketForm(request.POST, request.FILES)
         review_form = forms.ReviewForm(request.POST)
 
@@ -151,7 +204,7 @@ def create_standalone_review(request):
                 review.save()
 
                 message = "Critique créée avec succès !"
-                return redirect('flux')
+                return redirect("flux")
             else:
                 ticket.delete()
                 message = "Erreur lors de la création de la critique."
@@ -160,17 +213,41 @@ def create_standalone_review(request):
 
     return render(
         request,
-        'website/create-std-review.html',
+        "website/create-std-review.html",
         context={
-            'ticket_form': ticket_form,
-            'review_form': review_form,
-            'message': message
+            "ticket_form": ticket_form,
+            "review_form": review_form,
+            "message": message
         }
     )
 
 @login_required
-def create_related_review(request):
+def create_related_review(request, ticket_id):
+    ticket = Ticket.objects.get(id=ticket_id)
+    review_form = forms.ReviewForm()
+    message = ""
+    
+    if request.method == "POST":
+        review_form = forms.ReviewForm(request.POST)
+
+        if review_form.is_valid():
+            review: Review = review_form.save(commit=False)
+            review.ticket = ticket
+            review.user = request.user
+            review.save()
+
+            message = "Critique créée avec succès !"
+            return redirect("flux")
+        else:
+            message = "Erreur lors de la création de la critique"
+
+    
     return render(
         request,
-        'website/create-rel-review.html'
+        "website/create-rel-review.html",
+        context={
+            "ticket": ticket,
+            "review_form": review_form,
+            "message": message
+        }
     )

@@ -1,8 +1,12 @@
 {% load static %}
 <html>
     <head>
-        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="LIT Review">
+        <title>LIT Review{% block title %}{% endblock title %}</title>
         <link rel="stylesheet" href="{% static 'styles.css' %}">
+        <script type="text/javascript" src="{% static 'scripts.js' %}"></script>
     </head>
     <body>
         {% block header %}
@@ -14,12 +18,14 @@
                 {% endif %}
                 <h2>LIT Review</h2>
                 <nav>
-                    {% if user.is_authenticated %}
-                    <li><a href="{% url 'flux' %}">Flux</a></li>
-                    <li><a href="{% url 'posts' %}">Posts</a></li>
-                    <li><a href="{% url 'follows' %}">Abonnements</a></li>
-                    <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
-                    {% endif %}
+                    <ul>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'flux' %}">Flux</a></li>
+                        <li><a href="{% url 'posts' %}">Posts</a></li>
+                        <li><a href="{% url 'follows' %}">Abonnements</a></li>
+                        <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
+                        {% endif %}
+                    </ul>
                 </nav>
             </div>
         </header>

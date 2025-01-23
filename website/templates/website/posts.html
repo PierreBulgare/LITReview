@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load custom_filters %}
 {% block page_name %}Voir vos propres posts{% endblock page_name %}
 {% block main_content %}
 <div>
@@ -6,17 +7,42 @@
     <div class="posts-list">
         {% for post in posts %}
             <div class="post">
-                <p>Vous avez publié un ticket</p>
+                {% if post.is_ticket %}
+                    <p>Vous avez publié un ticket</p>
+                {% else %}
+                    <p>Vous avez publié une critique</p>
+                {% endif %}
                 <p class="ticket-date">{{ post.time_created|date:"H:i, j F Y" }}</p>
-                <p class="ticket-title">{{ post.title }}</p>
+                <p class="ticket-title">
+                    {{ post.title }}
+                    {% if not post.is_ticket %}
+                        - 
+                        {% for rate in post.rating|iteration %}
+                            ★
+                        {% endfor %}
+                        {% for rate in post.rating|remaining_stars %}
+                            ☆
+                        {% endfor %}
+                    {% endif %}
+                </p>
                 <p class="ticket-image-description">
                     {% if post.image %}
                         <img src="{{ post.image.url }}" alt="Image de {{ post.title }}" class="ticket-image">
-                    {% else %}
-                        <p>Aucune image disponible.</p>
                     {% endif %}
                     <span class="description">{{ post.description }}</span>
                 </p>
+                {% if not post.is_ticket %}
+                    <div class="post">
+                        <p class="ticket-date">{{ post.ticket.time_created|date:"H:i, j F Y" }}</p>
+                        <p class="ticket-title">{{ post.ticket.title }}</p>
+                        <p class="ticket-image-description">
+                            {% if post.ticket.image %}
+                                <img src="{{ post.ticket.image.url }}" alt="Image de {{ post.ticket.title }}" class="ticket-image">
+                            {% endif %}
+                            <span class="description">{{ post.ticket.description }}</span>
+                        </p>
+                    </div>
+                {% endif %}
                 <p class="ticket-buttons">
                     <a href="{% url 'edit_ticket' post.id %}" class="button">Modifier</a>
                     <a href="{% url 'delete_ticket' post.id %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
