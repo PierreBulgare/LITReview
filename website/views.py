@@ -32,8 +32,9 @@ def flux(request):
         title=F("headline")
     ).order_by("-time_created")
 
-    # Tickets déjà critiqués par l'utilisateur
-    reviewed_tickets = Review.objects.filter(user=request.user).values_list('ticket_id', flat=True)
+    # Tickets déjà critiqués
+    reviewed_tickets = Review.objects.all()
+
 
     # Combinaison des tickets et critiques triés par date de création
     posts = sorted(
