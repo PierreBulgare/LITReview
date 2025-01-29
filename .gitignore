@@ -1,4 +1,4 @@
 # Dossiers
-migrations/
+*/migrations/
 __pycache__/
 env/

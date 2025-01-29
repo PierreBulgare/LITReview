@@ -27,7 +27,7 @@ IF ERRORLEVEL 1 (
 
 REM Mise à jour de pip
 echo [INFO] Mise à jour de pip...
-pip install --upgrade pip >nul 2>&1
+python.exe -m pip install --upgrade pip >nul 2>&1
 IF ERRORLEVEL 1 (
     echo [ERREUR] Echec de la mise à jour de pip.
     pause

@@ -28,7 +28,7 @@ fi
 
 # Mise à jour de pip
 echo "[INFO] Mise à jour de pip..."
-pip install --upgrade pip
+python3 pip install --upgrade pip
 if [ $? -ne 0 ]; then
     echo "[ERREUR] Echec de la mise à jour de pip."
     deactivate
