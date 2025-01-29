@@ -15,6 +15,7 @@ Cette application web a pour objectif de permettre aux utilisateurs de créer, g
 
 * Packages requis :
   * `Django` 5.1.4 - Framework utilisé pour la conception de l'application
+  * `pillow` 11.1.0 - Pour la gestion des images
 
 ## Mode d'emploi
 ### Installation de l'environnement Python virtuel
