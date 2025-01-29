@@ -33,13 +33,20 @@ Pour utiliser le programme, vous devez d'abord installer un environnement Python
 Vous avez la possibilité de tester l'inscription, la connexion, la création d'un ticket, la création d'une critique et les fonctionnalités de gestions d'utilisateurs comme les abonnements.
 
 **Flux**\
-Cette page permet de visualiser les posts de l'utilisateur connecté et des utilisateurs suivis dans un ordre antichronologique. Il est aussi possible de répondre à des demandes de critiques.
+Cette page permet de visualiser les posts de l'utilisateur connecté et des utilisateurs suivis dans un ordre antichronologique. Il est aussi possible de répondre à des demandes de critiques.\
+Pour tester la page flux, la base de donnée possède quelques critiques et billets.\
+- Créez un compte sur l'application
+- Abonnez-vous à pierre.bulgare, camille.martin ou leopold.durand (ou les trois) pour avoir le flux
 
 **Posts**\
 Cette page permet à la visualisation et la gestion des posts de l'utilisateur connecté uniquement. L'utilisateur peut modifier ou supprimer ses billets et ses critiques.
 
 **Abonnements**\
 Cette page permet de gérer les fonctionnalités utilisateurs comme l'abonnement, le désabonnement et le blocage. Elle permet aussi de visualiser les utilisateurs abonnés.
+Trois utilisateurs sont disponibles dans la base de donnée pour essayer l'abonnement:
+- pierre.bulgare
+- camille.martin
+- leopold.durant
 
 **Création de Ticket**\
 La page de création de ticket propose un formule simple avec trois champs (Titre, Description et Image), seul le titre est requis, les deux autres champs sont facultatifs.
