@@ -3,6 +3,11 @@
 {% block page_name %}Vos posts{% endblock page_name %}
 {% block main_content %}
 <div>
+    {% if messages %}
+        {% for message in messages %}
+            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</>
+        {% endfor %}
+    {% endif %}
     <div class="posts-list">
         {% for post in posts %}
             <div class="post">
@@ -28,7 +33,13 @@
                     {% if post.image %}
                         <img src="{{ post.image.url }}" alt="Image de {{ post.title }}" class="ticket-image">
                     {% endif %}
-                    <span class="description">{{ post.description }}</span>
+                    <span class="description">
+                        {% if post.description %}
+                            {{ post.description }}
+                        {% else %}
+                            {{ post.comment }}
+                        {% endif %}
+                    </span>
                 </p>
                 {% if not post.is_ticket %}
                     <div class="post">
@@ -43,8 +54,13 @@
                     </div>
                 {% endif %}
                 <p class="ticket-buttons">
-                    <a href="{% url 'edit_ticket' post.id %}" class="button">Modifier</a>
-                    <a href="{% url 'delete_ticket' post.id %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
+                    {% if post.is_ticket %}
+                        <a href="{% url 'edit_ticket' post.id %}" class="button">Modifier</a>
+                        <a href="{% url 'delete_ticket' post.id %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
+                    {% else %}
+                        <a href="{% url 'edit_review' post.id %}" class="button">Modifier</a>
+                        <a href="{% url 'delete_review' post.id %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
+                    {% endif %}
                 </p>
             </div>
         {% endfor %}

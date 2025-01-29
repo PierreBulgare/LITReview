@@ -45,12 +45,14 @@
             </p>
             {% if post.description %}
                 <p class="ticket-description">{{ post.description }}</p>
+            {% else %}
+                <p class="ticket-description">{{ post.comment }}</p>
             {% endif %}
             {% if post.image %}
                 <img src="{{ post.image.url }}" alt="Couverture du livre" title="{{ post.title }}" class="ticket-image">
             {% endif %}
             {% if post.is_ticket%}
-                {% if post.user.username != user.username and post.id in reviewed_tickets %}
+                {% if post.user.username != user.username and post.id not in reviewed_tickets %}
                     <p class="ticket-buttons">
                         <a href="{% url 'create_related_review' post.id %}" class="answer-button button">Créer une critique</a>
                     </p>

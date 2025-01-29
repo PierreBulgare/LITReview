@@ -1,6 +1,12 @@
 from django import forms
 from .models import Ticket, Review
 from django.forms.widgets import RadioSelect
+from django.forms.widgets import ClearableFileInput
+
+
+class CustomClearableFileInput(ClearableFileInput):
+    template_name = "widgets/custom_clearable_file_input.html"
+
 
 class CustomRadioSelect(RadioSelect):
     def get_context(self, name, value, attrs):
@@ -8,6 +14,7 @@ class CustomRadioSelect(RadioSelect):
         class_name = "rating"
         context['widget']['attrs']['class'] = class_name
         return context
+
 
 class FollowUserForm(forms.Form):
     username = forms.CharField(
@@ -26,11 +33,12 @@ class FollowUserForm(forms.Form):
         for field_name, field in self.fields.items():
             field.label = ""
 
+
 class TicketForm(forms.ModelForm):
     class Meta:
         model = Ticket
         fields = ["title", "description", "image"]
-    
+
     title = forms.CharField(
         max_length=100,
         widget=forms.TextInput()
@@ -41,6 +49,7 @@ class TicketForm(forms.ModelForm):
     )
     image = forms.ImageField(
         required=False,
+        widget=CustomClearableFileInput(),
     )
 
     def __init__(self, *args, **kwargs):
@@ -55,10 +64,11 @@ class TicketForm(forms.ModelForm):
             else:
                 field.label = ""
 
+
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ["headline", "rating", "description"]
+        fields = ["headline", "rating", "comment"]
 
     headline = forms.CharField(
         max_length=100,
@@ -73,7 +83,7 @@ class ReviewForm(forms.ModelForm):
         )
 
     )
-    description = forms.CharField(      
+    comment = forms.CharField(
         widget=forms.Textarea()
     )
 
@@ -84,7 +94,7 @@ class ReviewForm(forms.ModelForm):
                 field.label = "Titre"
             elif field_name == "rating":
                 field.label = "Note"
-            elif field_name == "description":
+            elif field_name == "comment":
                 field.label = "Commentaire"
             else:
                 field.label = ""

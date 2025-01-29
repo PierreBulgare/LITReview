@@ -1,8 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
-
 from . import forms
+
 
 def login_page(request):
     if request.user.is_authenticated:
@@ -34,9 +34,11 @@ def login_page(request):
         }
     )
 
+
 def logout_page(request):
     logout(request)
     return redirect('login')
+
 
 def signup_page(request):
     form = forms.SignUpForm()
@@ -45,9 +47,9 @@ def signup_page(request):
         form = forms.SignUpForm(request.POST)
 
         if form.is_valid():
-            username=form.cleaned_data['username']
-            password=form.cleaned_data['password']
-            confirm_password=form.cleaned_data['confirm_password']
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            confirm_password = form.cleaned_data['confirm_password']
             # Vérifie si le nom d'utilisateur est déjà pris
             if User.objects.filter(username=username).exists():
                 message = "Ce nom d'utilisateur est déjà pris !"

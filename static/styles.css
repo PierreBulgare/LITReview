@@ -47,6 +47,10 @@ h1 {
     font-weight: bold;
 }
 
+.clearablefileinput a {
+    display: none;
+}
+
 main {
     display: flex;
     flex-direction: row;

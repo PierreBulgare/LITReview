@@ -1,0 +1,5 @@
+[flake8]
+exclude = env, venv, migrations
+max-line-length = 79
+format = html
+htmldir = flake8-report

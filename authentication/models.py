@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 
+
 class UserFollows(models.Model):
     user = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,

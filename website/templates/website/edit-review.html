@@ -6,19 +6,8 @@
     <p>{{ message }}</p>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.title }}
-        {{ form.description }}
+        {{ form.as_p }}
 
-        {% if ticket.image %}
-            <div style="margin-bottom: 10px;">
-                <p>Image actuelle :</p>
-                <img src="{{ ticket.image.url }}" alt="Image actuelle" style="max-width: 200px; max-height: 200px;">
-            </div>
-        {% endif %}
-
-        
-        <label for="id_image">{% if ticket.image %}Changer d'image :{% else %}Ajouter une image :{% endif %}</label>
-        {{ form.image }}
         <button type="submit" class="button">Valider</button>
         <button class="button"><a href="{% url 'posts' %}">Annuler</a></button>
     </form>

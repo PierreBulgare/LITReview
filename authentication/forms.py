@@ -1,5 +1,6 @@
 from django import forms
 
+
 class LoginForm(forms.Form):
     username = forms.CharField(
         max_length=30,
@@ -20,6 +21,7 @@ class LoginForm(forms.Form):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             field.label = ""
+
 
 class SignUpForm(forms.Form):
     username = forms.CharField(

@@ -33,11 +33,21 @@ urlpatterns = [
     path('search-users/', website.views.search_users, name='search_users'),
     path('posts/', website.views.posts, name='posts'),
     path('create-ticket/', website.views.create_ticket, name='create_ticket'),
-    path('edit-ticket/<int:ticket_id>/', website.views.edit_ticket, name='edit_ticket'),
-    path('delete-ticket/<int:ticket_id>/', website.views.delete_ticket, name='delete_ticket'),
-    path('create-std-review/', website.views.create_standalone_review, name='create_standalone_review'),
-    path('create-rel-review/<int:ticket_id>/', website.views.create_related_review, name='create_related_review')
+    path('edit-ticket/<int:ticket_id>/',
+         website.views.edit_ticket, name='edit_ticket'),
+    path('delete-ticket/<int:ticket_id>/',
+         website.views.delete_ticket, name='delete_ticket'),
+    path('create-std-review/',
+         website.views.create_standalone_review,
+         name='create_standalone_review'),
+    path('create-rel-review/<int:ticket_id>/',
+         website.views.create_related_review, name='create_related_review'),
+    path('edit-review/<int:review_id>/',
+         website.views.edit_review, name='edit_review'),
+    path('delete-review/<int:review_id>/',
+         website.views.delete_review, name='delete_review'),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
