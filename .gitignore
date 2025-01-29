@@ -1,3 +1,4 @@
 # Dossiers
 env/
 __pycache__/
+flake8-report/
