@@ -1,10 +1,20 @@
+/* Définition des variables CSS pour une meilleure maintenance */
+:root {
+    --main-border: 1px solid black;
+    --border-radius: 10px;
+    --padding: 10px;
+}
+
+/* Styles généraux */
 * {
     font-family: 'Roboto', sans-serif;
     color: black;
 }
 
 body {
-    list-style-type: none;
+    list-style: none;
+    width: 70%;
+    margin: 10px auto;
 }
 
 a {
@@ -13,11 +23,25 @@ a {
 
 p {
     margin: 0;
-    padding: 5px 0px;
+    padding: 5px 0;
 }
 
 h1 {
     text-align: center;
+}
+
+h2 sub {
+    font-size: 0.5em;
+}
+
+h2 {
+    text-align: center;
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 footer {
@@ -28,39 +52,37 @@ footer {
     display: none !important;
 }
 
-.header_content, main {
-    border: 1px solid black;
-    padding: 10px;
-    border-radius: 10px;
-}
-
+/* En-tête */
 .header_content {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    position: relative;
     padding: 20px;
+    border: var(--main-border);
+    border-radius: var(--border-radius);
+    position: relative;
 }
 
-.header_content h1 {
-    margin: 0 auto;
-}
-
+/* Effet au survol des éléments de liste */
 .header_content li:hover {
     font-weight: bold;
 }
 
+/* Suppression du lien de suppression dans les inputs fichiers */
 .clearablefileinput a {
     display: none;
 }
 
+/* Contenu principal */
 main {
     display: flex;
-    flex-direction: row;
     justify-content: space-evenly;
+    border: var(--main-border);
+    padding: var(--padding);
+    border-radius: var(--border-radius);
 }
 
+/* Conteneur des sections du main */
 main > div {
     display: flex;
     flex-direction: column;
@@ -69,6 +91,7 @@ main > div {
     width: 100%;
 }
 
+/* Formulaire */
 form {
     display: flex;
     flex-direction: column;
@@ -76,69 +99,96 @@ form {
     width: 50%;
 }
 
+.create-std-review-form {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.create-std-review-form h3 {
+    text-align: center;
+}
+
+hr {
+    border: none;
+    height: 2px;
+    background-color: #ccc;
+    margin: 20px 0;
+}
+
+/* Boutons */
 .button-container {
     display: flex;
-    flex-direction: row;
     justify-content: center;
     width: 100%;
     gap: 10px;
 }
 
 .button {
-    border: 1px solid black;
-    border-radius: 10px;
+    border: var(--main-border);
+    border-radius: var(--border-radius);
     padding: 10px 20px;
     cursor: pointer;
     background-color: white;
 }
 
-input {
-    border: 1px solid black;
-    border-radius: 10px;
+/* Inputs */
+input, textarea {
+    border: var(--main-border);
+    border-radius: var(--border-radius);
     padding: 10px;
     text-align: center;
     width: 100%;
 }
 
-h1 sub {
-    font-size: 0.5em;
+textarea {
+    height: 200px;
 }
 
+/* Navigation */
 nav {
     display: flex;
-    flex-direction: row;
     align-items: center;
     position: absolute;
     right: 1%;
 }
 
+/* Listes */
 ul {
     display: flex;
     flex-direction: row;
     gap: 20px;
-    list-style-type: none;
+    list-style: none;
 }
 
 li {
     cursor: pointer;
 }
 
+/* Texte en gras */
 .bold-element {
     font-weight: bold;
 }
 
+/* Suggestions utilisateurs */
 .users-suggestions-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
     width: 20%;
-    border: 1px solid black;
+    border: var(--main-border);
+    padding: 10px;
+    border-radius: 10px;
 }
 
+/* Effet au survol */
 .users-suggestions-list li:hover {
-    background-color: lightgray;
+    font-weight: bold;
 }
 
+/* Formulaire de suivi */
 .follow-form {
     display: flex !important;
     flex-direction: row;
@@ -147,6 +197,7 @@ li {
     gap: 10px;
 }
 
+/* Liste des suivis */
 .follows-list {
     display: flex;
     flex-direction: column;
@@ -155,34 +206,32 @@ li {
     gap: 10px;
 }
 
+/* Éléments de la liste des suivis */
 .follows-list div {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    border: 1px solid black;
+    border: var(--main-border);
     padding: 5px;
     width: 40%;
     height: 40px;
     position: relative;
 }
 
-.follows-options  {
+/* Options de suivi */
+.follows-options {
     position: absolute;
     right: 5px;
 }
 
+/* Suppression du style des liens dans les options */
 .follows-options a {
-    border: none;
+    border-left: var(--main-border);
     border-radius: 0;
+    border: none;
     border-left: 1px solid black;
-    height: auto;
 }
 
-textarea {
-    width: 100%;
-    height: 200px;
-}
-
+/* Liste des publications */
 .posts-list {
     display: flex;
     flex-direction: column;
@@ -191,18 +240,21 @@ textarea {
     align-items: center;
 }
 
+/* Conteneur d'un post */
 .post {
-    border: 1px solid black;
-    width: 60%;
+    border: var(--main-border);
+    width: 80%;
     padding: 5px;
     position: relative;
 }
 
-.post div.post {
+/* Contenu d'un post */
+.post > div {
     width: 90%;
     margin: 0 auto;
 }
 
+/* Ticket (élément de publication) */
 .ticket-image-description {
     display: flex;
     flex-direction: row;
@@ -226,25 +278,26 @@ textarea {
     top: 5px;
 }
 
+/* Boutons d'un ticket */
 .ticket-buttons {
     display: flex;
     flex-direction: row;
     gap: 10px;
-    justify-self: flex-end;
+    justify-content: flex-end;
 }
 
+/* Aperçu du ticket */
 .ticket-preview {
     width: 100%;
 }
 
+/* Notation */
 .rating {
     display: flex;
-    flex-direction: row;
     justify-content: space-evenly;
 }
 
 .rating label {
     display: flex;
-    flex-direction: row;
     gap: 10px;
 }

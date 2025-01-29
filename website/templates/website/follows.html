@@ -4,7 +4,6 @@
 {% block main_content %}
 <div>
     <p>Suivre d'autres utilisateurs</p>
-    <p>{{ message }}</p>
     <form method="post" class="follow-form">
         {{ form.as_p }}
         {% csrf_token %}
@@ -13,11 +12,9 @@
     <div id="users-suggestions-list" class="users-suggestions-list hidden">
     </div>
     {% if messages %}
-    <ul>
         {% for message in messages %}
-            <li>{{ message }}</li>
+            <p class="bold-element">{{ message }}</p>
         {% endfor %}
-    </ul>
     {% endif %}
     <h2>Abonnements</h2>
     <div class="follows-list">

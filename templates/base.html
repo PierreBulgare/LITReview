@@ -12,25 +12,25 @@
     <body>
         {% block header %}
         <header>
+            <h1>📖 LIT Review 📖</h1>
             <div class="header_content">
                 {% if user.is_authenticated %}
                 <span class="bold-element">👤 {{ user.username }}</span>
                 {% endif %}
-                <h1>📖 LIT Review 📖</h1>
                 <nav aria-label="Menu principal">
                     <ul>
                         {% if user.is_authenticated %}
-                            <li><a href="{% url 'flux' %}">📰 Flux</a></li>
-                            <li><a href="{% url 'posts' %}">📃 Posts</a></li>
-                            <li><a href="{% url 'follows' %}">👥 Abonnements</a></li>
-                            <li><a href="{% url 'logout' %}">❌ Se déconnecter</a></li>
+                            <li><a href="{% url 'flux' %}" title="Afficher votre flux">📰 Flux</a></li>
+                            <li><a href="{% url 'posts' %}" title="Afficher vos posts">📃 Posts</a></li>
+                            <li><a href="{% url 'follows' %}" title="Afficher vos abonnements">👥 Abonnements</a></li>
+                            <li><a href="{% url 'logout' %}" title="Déconnexion">❌ Se déconnecter</a></li>
                         {% else %}
-                            <li><a href="{% url 'login' %}">🔑 Se connecter</a></li>
+                            <li><a href="{% url 'login' %}" title="Connexion">🔑 Se connecter</a></li>
                         {% endif %}
                     </ul>
                 </nav>
             </div>
-            <h1>{% block page_name %}{% endblock page_name %}</h1>
+            <h2>{% block page_name %}{% endblock page_name %}</h2>
         </header>
         {% endblock header %}
         {% block main %}

@@ -9,6 +9,10 @@
             <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</>
         {% endfor %}
     {% endif %}
+    <p>
+        <button type="button" onclick="window.location.href='{% url 'create_ticket' %}'" class="button">Demander une critique</button>
+        <button type="button" onclick="window.location.href='{% url 'create_standalone_review' %}'" class="button">Créer une critique</button>
+    </p>
     <div class="posts-list">
         {% for post in posts %}
             <div class="post">

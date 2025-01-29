@@ -3,6 +3,11 @@
 {% block page_name %}Créer une critique<br><sub>(en réponse à un ticket)</sub>{% endblock page_name %}
 {% block main_content %}
 <div class="ticket-preview">
+    {% if messages %}
+        {% for message in messages %}
+            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</>
+        {% endfor %}
+    {% endif %}
     <p>Vous êtes en train de poster en réponse à</p>
     <div class="post">
         <p><b>{{ ticket.user.username }}</b> a demandé une critique</p>
