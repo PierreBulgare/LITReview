@@ -17,7 +17,7 @@
             <p class="ticket-description">{{ ticket.description }}</p>
         {% endif %}
         {% if ticket.image %}
-            <img src="{{ ticket.image.url }}" alt="Couverture du livre" title="{{ ticket.title }}" class="ticket-image">
+            <img src="{{ ticket.image.url }}" alt="Image de couverture de {{ ticket.title }}" title="{{ ticket.title }}" class="ticket-image">
         {% endif %}
     </div>
 </div>

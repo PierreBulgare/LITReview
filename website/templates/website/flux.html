@@ -5,8 +5,8 @@
 {% block main_content %}
 <div>
     <p>
-        <button type="button" onclick="window.location.href='{% url 'create_ticket' %}'" class="button">Demander une critique</button>
-        <button type="button" onclick="window.location.href='{% url 'create_standalone_review' %}'" class="button">Créer une critique</button>
+        <button type="button" onclick="window.location.href='{% url 'create_ticket' %}'" class="button" title="Demander une critique">Demander une critique</button>
+        <button type="button" onclick="window.location.href='{% url 'create_standalone_review' %}'" class="button" title="Créer une critique">Créer une critique</button>
     </p>
     <div class="posts-list">
         {% for post in posts %}
@@ -59,14 +59,14 @@
             </p>
             {# Si le post contient une image #}
             {% if post.image %}
-                <img src="{{ post.image.url }}" alt="Couverture du livre" title="{{ post.title }}" class="ticket-image">
+                <img src="{{ post.image.url }}" alt="Image de couverture de {{ post.title }}" title="{{ post.title }}" class="ticket-image">
             {% endif %}
             {# Si le post est un ticket #}
             {% if post.is_ticket%}
                 {# Si l'utilisateur connecté n'est pas l'auteur, qu'aucune critique n'a été publiée, afficher le bouton de création de critique #}
                 {% if post.user.username != user.username and post.id not in reviewed_tickets %}
                     <p class="ticket-buttons">
-                        <a href="{% url 'create_related_review' post.id %}" class="answer-button button">Créer une critique</a>
+                        <a href="{% url 'create_related_review' post.id %}" class="answer-button button" title="Créer une critique">Créer une critique</a>
                     </p>
                 {% endif %}
             {% else %}
@@ -79,7 +79,7 @@
                     <p class="ticket-description">{{ post.ticket.description }}</p>
                 {% endif %}
                 {% if post.ticket.image %}
-                    <img src="{{ post.ticket.image.url }}" alt="Couverture du livre" title="{{ post.ticket.title }}" class="ticket-image">
+                    <img src="{{ post.ticket.image.url }}" alt="Image de couverture de {{ post.ticket.title }}" title="{{ post.ticket.title }}" class="ticket-image">
                 {% endif %}
             </div>
             {% endif %}

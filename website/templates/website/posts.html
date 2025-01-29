@@ -36,7 +36,7 @@
                 </p>
                 <p class="ticket-image-description">
                     {% if post.image %}
-                        <img src="{{ post.image.url }}" alt="Image de {{ post.title }}" class="ticket-image">
+                        <img src="{{ post.image.url }}" alt="Image de couverture de {{ post.title }}" title="{{ post.title }}" class="ticket-image">
                     {% endif %}
                     <span class="description">
                         {% if post.description %}
@@ -52,7 +52,7 @@
                         <p class="ticket-title">{{ post.ticket.title }}</p>
                         <p class="ticket-image-description">
                             {% if post.ticket.image %}
-                                <img src="{{ post.ticket.image.url }}" alt="Image de {{ post.ticket.title }}" class="ticket-image">
+                                <img src="{{ post.ticket.image.url }}" alt="Image de couverture de {{ post.ticket.title }}" title="{{ post.ticket.title }}" class="ticket-image">
                             {% endif %}
                             <span class="description">{{ post.ticket.description }}</span>
                         </p>
@@ -60,11 +60,17 @@
                 {% endif %}
                 <p class="ticket-buttons">
                     {% if post.is_ticket %}
-                        <a href="{% url 'edit_ticket' post.id 'ticket' %}" class="button">Modifier</a>
-                        <a href="{% url 'delete_ticket' post.id 'ticket' %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
+                        <a href="{% url 'edit_ticket' post.id 'ticket' %}" class="button" title="Modifier le ticket"
+                        aria-label="Ouvre la page de modification des tickets">Modifier</a>
+                        <a href="{% url 'delete_ticket' post.id 'ticket' %}" class="button" title="Supprimer le ticket"
+                        aria-label="Supprime le ticket et les critiques associées"
+                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
                     {% else %}
-                        <a href="{% url 'edit_review' post.id 'review' %}" class="button">Modifier</a>
-                        <a href="{% url 'delete_review' post.id 'review' %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
+                        <a href="{% url 'edit_review' post.id 'review' %}" class="button" title="Modifier la critique"
+                        aria-label="Ouvre la page de modification des critiques">Modifier</a>
+                        <a href="{% url 'delete_review' post.id 'review' %}" class="button"  title="Supprimer la critique"
+                        aria-label="Supprime la critique"
+                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
                     {% endif %}
                 </p>
             </div>

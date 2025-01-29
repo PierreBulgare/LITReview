@@ -16,36 +16,39 @@
             <p class="bold-element">{{ message }}</p>
         {% endfor %}
     {% endif %}
+
     <h2>Abonnements</h2>
     <div class="follows-list">
         {% for user in following %}
             {%if user not in blocked_users %}
                 <div>👤 {{ user }}
                     <p class="follows-options">
-                        <a href="../block/user_{{ user.user_id }}/" class="button">🚫 Bloquer</a>
-                        <a href="../unfollow/user_{{ user.user_id }}/" class="button">❌ Désabonner</a>
-                    </p>
+                        <a href="../block/user_{{ user.user_id }}/" class="button" title="Bloquer l'utilisateur">🚫 Bloquer</a>
+                        <a href="../unfollow/user_{{ user.user_id }}/" class="button" title="Se désabonner">❌ Désabonner</a>
+                    </p>                    
                 </div>
             {% endif %}
         {% endfor %}
     </div>
+
     <h2>Abonnés</h2>
     <div class="follows-list">
         {% for follower in followers %}
             {%if follower not in blocked_users %}
                 <div>👤 {{ follower }}
                     <p class="follows-options">
-                        <a href="../block/user_{{ follower.user_id }}/" class="button">🚫 Bloquer</a>
+                        <a href="../block/user_{{ user.user_id }}/" class="button" title="Bloquer l'utilisateur">🚫 Bloquer</a>
                 </div>
             {% endif %}
         {% endfor %}
     </div>
+
     <h2>Utilisateurs bloqués</h2>
     <div class="follows-list">
         {% for blocked in blocked_users %}
             <div>👤 {{ blocked }}
                 <p class="follows-options">
-                    <a href="../unblock/user_{{ blocked.user_id }}/" class="button">🔓 Débloquer</a>
+                    <a href="../unblock/user_{{ blocked.user_id }}/" class="button" title="Débloquer l'utilisateur">🔓 Débloquer</a>
                 </p>
             </div>
         {% endfor %}
