@@ -1,9 +1,16 @@
 {% extends "base.html" %}
+{% block title %}Inscription{% endblock title %}
 {% block page_name %}Formulaire d'inscription{% endblock page_name %}
 {% block main_content %}
 <div>
     <h2>Incrivez-vous</h2>
-    <p>{{ message }}</p>
+    {# Affiche les messages d'erreurs de connexion #}
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    {# Formulaire d'inscription #}
     <form method="post">
         {{ form.as_p }}
         {% csrf_token %}

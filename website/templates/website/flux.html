@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load custom_filters %}
-{% block title %} | Flux{% endblock title %}
+{% block title %}Flux{% endblock title %}
 {% block page_name %}Flux{% endblock page_name %}
 {% block main_content %}
 <div>
@@ -13,26 +13,31 @@
         <div class="post">
             <p>
                 {% if post.is_ticket %}
-                    {% if post.user.username == user.username %}
-                     vous avez demandé une critique
-                    {% else %}
-                    <span class="bold-element">
-                        👤 {{ post.user.username }}
-                    </span> a demandé une critique
-                    {% endif %}
+                    {% with post_type="demandé une critique" %}
+                        {% if post.user.username == user.username %}
+                            Vous avez {{ post_type }}
+                        {% else %}
+                            <span class="bold-element">
+                                👤 {{ post.user.username }}
+                            </span> a {{ post_type }}
+                        {% endif %}
+                    {% endwith %}
                 {% else %}
-                    {% if post.user.username == user.username%}
-                     vous avez publié une critique
-                    {% else %}
-                    <span class="bold-element">
-                        👤 {{ post.user.username }}
-                    </span> a publié une critique
-                    {% endif %}
-                {% endif %}
+                    {% with post_type="publié une critique" %}
+                        {% if post.user.username == user.username %}
+                            Vous avez {{ post_type }}
+                        {% else %}
+                            <span class="bold-element">
+                                👤 {{ post.user.username }}
+                            </span> a {{ post_type }}
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}  
             </p>
             <p class="ticket-date">{{ post.time_created|date:"H:i, j F Y" }}</p>
             <p class="ticket-title">
                 {{ post.title }}
+                {# Si le post est une critique, afficher la note #}
                 {% if not post.is_ticket %}
                     - 
                     {% for rate in post.rating|iteration %}
@@ -43,24 +48,32 @@
                     {% endfor %}
                 {% endif %}
             </p>
-            {% if post.description %}
-                <p class="ticket-description">{{ post.description }}</p>
-            {% else %}
-                <p class="ticket-description">{{ post.comment }}</p>
-            {% endif %}
+            <p class="ticket-description">
+                {# Si le post est un ticket, afficher la description #}
+                {% if post.description %}
+                    {{ post.description }}
+                {# Si le post est une critique, afficher le commentaire #}
+                {% else %}
+                    {{ post.comment }}
+                {% endif %}
+            </p>
+            {# Si le post contient une image #}
             {% if post.image %}
                 <img src="{{ post.image.url }}" alt="Couverture du livre" title="{{ post.title }}" class="ticket-image">
             {% endif %}
+            {# Si le post est un ticket #}
             {% if post.is_ticket%}
+                {# Si l'utilisateur connecté n'est pas l'auteur, qu'aucune critique n'a été publiée, afficher le bouton de création de critique #}
                 {% if post.user.username != user.username and post.id not in reviewed_tickets %}
                     <p class="ticket-buttons">
                         <a href="{% url 'create_related_review' post.id %}" class="answer-button button">Créer une critique</a>
                     </p>
                 {% endif %}
             {% else %}
+            {# Si le post est une critique, afficher le ticket en référence #}
             <div class="post">
                 <p>Ticket <b>{{ post.ticket.id }}</b></p>
-                <span class="bold-element">👤 {{ post.ticket.user.username }}</span>
+                <b>👤 {{ post.ticket.user.username }}</b>
                 <p class="ticket-title">{{ post.ticket.title }}</p>
                 {% if post.ticket.description %}
                     <p class="ticket-description">{{ post.ticket.description }}</p>

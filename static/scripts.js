@@ -43,7 +43,6 @@ async function searchUser(input, suggestionList) {
 document.addEventListener('DOMContentLoaded', () => {
   const input = document.getElementById('search-username');
   const suggestionList = document.getElementById('users-suggestions-list');
-  console.log(input, suggestionList);
   searchUser(input, suggestionList);
 });
 

@@ -20,6 +20,10 @@ h1 {
     text-align: center;
 }
 
+footer {
+    text-align: center;
+}
+
 .hidden {
     display: none !important;
 }
@@ -151,7 +155,7 @@ li {
     gap: 10px;
 }
 
-.follows-list p {
+.follows-list div {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -162,9 +166,12 @@ li {
     position: relative;
 }
 
-.follows-list a.button {
+.follows-options  {
     position: absolute;
     right: 5px;
+}
+
+.follows-options a {
     border: none;
     border-radius: 0;
     border-left: 1px solid black;

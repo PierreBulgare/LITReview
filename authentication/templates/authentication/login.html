@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Connexion{% endblock title %}
 {% block main_content %}
 <div>
     <h2>Incrivez-vous maintenant</h2>
@@ -6,7 +7,13 @@
 </div>
 <div>
     <h2>Connectez-vous</h2>
-    <p>{{ message }}</p>
+    {# Affiche les messages d'erreurs de connexion #}
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    {# Formulaire de connexion #}
     <form method="post">
         {{ form.as_p }}
         {% csrf_token %}

@@ -2,62 +2,69 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.db.models import Value, BooleanField, F
+from django.db.models import Value, BooleanField, F, Q
 from .models import Ticket, Review
-from django.http import JsonResponse
+from django.core.exceptions import ValidationError
+from django.http import JsonResponse, HttpRequest
 from itertools import chain
 from . import forms
+from .functions import clear_messages, handle_action
 
 
 @login_required
-def flux(request):
-    # Tickets et criqtiues de l'utilisateur connecté
-    user_tickets = Ticket.objects.filter(user=request.user).annotate(
-        is_ticket=Value(True, output_field=BooleanField())
-    ).order_by("-time_created")
+def flux(request: HttpRequest):
+    """
+    Vue pour afficher le flux des tickets et critiques.
 
-    user_reviews = Review.objects.filter(user=request.user).annotate(
-        is_ticket=Value(False, output_field=BooleanField()),
-        title=F("headline")  # Renommer "headline" en "title"
-    ).order_by("-time_created")
+    Cette vue récupère et combine les tickets et critiques de l'utilisateur,
+    des utilisateurs suivis, et des critiques sur les tickets de l'utilisateur.
+    Les résultats sont triés par date de création et rendus
+    dans le template "website/flux.html".
 
-    # Tickets et critiques des utilisateurs suivis
+    Args:
+        request (HttpRequest): L'objet de requête HTTP.
+
+    Returns:
+        HttpResponse: La réponse HTTP avec le template rendu.
+    """
+
+    # Utilisateurs suivis par l'utilisateur actuel
     followed_profiles = request.user.profile.follows.all()
-    other_tickets = Ticket.objects.filter(
-        user__profile__in=followed_profiles
-        ).annotate(
+
+    # Tickets de l'utilisateur et des utilisateurs suivis
+    # Ajoute un champ "is_ticket" pour distinguer les tickets des critiques
+    tickets = Ticket.objects.filter(
+        Q(user__profile__in=followed_profiles) | Q(user=request.user)
+    ).exclude(
+        Q(user__profile__blocked=request.user.profile) | Q(user__profile__in=request.user.profile.blocked.all())
+    ).annotate(
         is_ticket=Value(True, output_field=BooleanField())
-        ).order_by("-time_created")
+    ).select_related("user").order_by("-time_created")
 
-    other_reviews = Review.objects.filter(
-        user__profile__in=followed_profiles
-        ).exclude(
-            ticket__user=request.user
-        ).exclude(
-            ticket__in=Review.objects.filter(
-                ticket__user=request.user).values("ticket")
-        ).annotate(
-            is_ticket=Value(False, output_field=BooleanField()),
-            title=F("headline")
-        ).order_by("-time_created")
+    # Critiques de l'utilisateur et des utilisateurs suivis
+    # Ajoute un champ "is_ticket" pour distinguer les critiques des tickets
+    # Renomme le champ "headline" en "title"
+    reviews = Review.objects.filter(
+        Q(user__profile__in=followed_profiles)
+        | Q(user=request.user)
+        | Q(ticket__user__profile__in=followed_profiles)
+    ).exclude(
+        Q(user__profile__blocked=request.user.profile)
+        | Q(ticket__user__profile__blocked=request.user.profile)
+        | Q(user__profile__in=request.user.profile.blocked.all())
+        | Q(ticket__user__profile__in=request.user.profile.blocked.all())
+    ).annotate(
+        is_ticket=Value(False, output_field=BooleanField()),
+        title=F("headline")
+    ).select_related("user", "ticket").order_by("-time_created")
 
-    reviews_on_my_tickets = Review.objects.filter(
-        ticket__user=request.user
-        ).exclude(
-            user=request.user
-        ).annotate(
-            is_ticket=Value(False, output_field=BooleanField()),
-            title=F("headline")
-        ).order_by("-time_created")
+    # Tickets déjà critiqués sur l'application
+    reviewed_tickets = set(Review.objects.filter(
+        Q(user__profile__in=followed_profiles) | Q(user=request.user)
+    ).values_list("ticket_id", flat=True))
 
-    reviews = list(chain(other_reviews, reviews_on_my_tickets))
-
-    # Tickets déjà critiqués
-    reviewed_tickets = set(Review.objects.values_list("ticket_id", flat=True))
-
-    # Combinaison des tickets et critiques triés par date de création
     posts = sorted(
-        chain(user_tickets, user_reviews, other_tickets, reviews),
+        chain(tickets, reviews),
         key=lambda x: x.time_created,
         reverse=True
     )
@@ -73,11 +80,35 @@ def flux(request):
 
 
 @login_required
-def follows(request):
-    form = forms.FollowUserForm()
-    message = ""
-    followed_users = request.user.profile.follows.all()
+@clear_messages
+def follows(request: HttpRequest):
+    """
+    Gère la vue pour suivre d'autres utilisateurs.
+
+    Cette fonction affiche un formulaire permettant à l'utilisateur connecté
+    de suivre d'autres utilisateurs.
+    Elle traite également les soumissions de formulaire pour ajouter
+    de nouveaux utilisateurs à la liste des suivis.
+
+    Args:
+        request (HttpRequest): L'objet de requête HTTP.
+
+    Returns:
+        HttpResponse: La réponse HTTP avec le rendu du template
+        'website/follows.html' et le contexte mis à jour.
+
+    Context:
+        form (FollowUserForm): Le formulaire pour suivre un utilisateur.
+        message (str): Un message indiquant le résultat de l'action de suivi.
+        followed_users (QuerySet): La liste des utilisateurs suivis
+        par l'utilisateur connecté.
+        followers (QuerySet): La liste des utilisateurs qui suivent
+        l'utilisateur connecté.
+    """
+
+    following = request.user.profile.follows.all()
     followers = request.user.profile.followed_by.all()
+    blocked_users = request.user.profile.blocked.all()
 
     if request.method == "POST":
         form = forms.FollowUserForm(request.POST)
@@ -85,77 +116,224 @@ def follows(request):
         if form.is_valid():
             username = form.cleaned_data["username"]
 
-            try:
+            def action():
+                if not User.objects.filter(username=username).exists():
+                    raise ValueError("Cet utilisateur n'existe pas !")
+                elif request.user.username == username:
+                    raise ValueError(
+                        "Vous ne pouvez pas vous suivre vous-même !"
+                        )
+
                 user_to_follow = User.objects.get(username=username)
 
-                if user_to_follow == request.user:
-                    message = "Vous ne pouvez pas vous suivre vous-même !"
-                elif user_to_follow.profile in followed_users:
-                    message = "Vous suivez déjà cet utilisateur !"
+                if user_to_follow.profile in following:
+                    raise ValueError("Vous suivez déjà cet utilisateur !")
                 else:
                     request.user.profile.follows.add(user_to_follow.profile)
-                    message = "Utilisateur suivi avec succès !"
-                    followed_users = request.user.profile.follows.all()
-            except User.DoesNotExist:
-                message = "Cet utilisateur n'existe pas !"
-            except AttributeError:
-                message = "Erreur de configuration du profil utilisateur."
+
+            return handle_action(
+                request,
+                action,
+                "Utilisateur suivi avec succès !",
+                "Erreur lors du suivi de l'utilisateur.",
+                redirect_url="follows"
+            )
+    else:
+        form = forms.FollowUserForm()
+
     return render(
         request,
         "website/follows.html",
         context={
             "form": form,
-            "message": message,
-            "followed_users": followed_users,
-            "followers": followers
+            "following": following,
+            "followers": followers,
+            "blocked_users": blocked_users
         }
     )
 
 
 @login_required
-def unfollow(request, user_id):
-    if user_id == str(request.user.id):
-        messages.error(
-            request, "Vous ne pouvez pas vous désabonner de vous-même !"
-            )
-        return redirect("follows")
-    try:
-        user_id = int(user_id.split("_")[-1])
+def unfollow(request: HttpRequest, user_id: str):
+    """
+    Permet à un utilisateur de se désabonner d'un autre utilisateur.
+    Args:
+        request (HttpRequest): La requête HTTP contenant les informations
+        de l'utilisateur actuel.
+        user_id (int): L'identifiant de l'utilisateur à désabonner.
+    Returns:
+        HttpResponse: Redirige vers la page des abonnements après avoir tenté
+        de se désabonner.
+    Raises:
+        User.DoesNotExist: Si l'utilisateur à désabonner n'existe pas.
+    Notes:
+        - Si l'utilisateur tente de se désabonner de lui-même,
+        un message d'erreur est affiché.
+        - Si l'utilisateur à désabonner n'existe pas,
+        un message d'erreur est affiché.
+    """
+
+    user_id = int(user_id.split("_")[-1])
+
+    def action():
+        if not User.objects.filter(id=user_id).exists():
+            raise ValueError("Cet utilisateur n'existe pas !")
+        elif user_id == request.user.id:
+            raise ValueError(
+                "Vous ne pouvez pas vous désabonner de vous-même !"
+                )
         user_to_unfollow = User.objects.get(id=user_id)
         request.user.profile.follows.remove(user_to_unfollow.profile)
-    except User.DoesNotExist:
-        messages.error(request, "Cet utilisateur n'existe pas !")
 
-    return redirect("follows")
+    return handle_action(
+        request,
+        action,
+        "Désabonnement effectué avec succès !",
+        "Erreur lors du désabonnement.",
+        redirect_url="follows"
+    )
+
+@login_required
+def block(request: HttpRequest, user_id: str):
+    """
+    Bloque un utilisateur.
+
+    Args:
+        request (HttpRequest): L'objet de la requête HTTP.
+        user_id (str): L'identifiant de l'utilisateur à bloquer.
+
+    Returns:
+        HttpResponse: Redirige vers la page des abonnements après avoir bloqué
+        l'utilisateur.
+    """
+
+    user_id = int(user_id.split("_")[-1])
+
+    def action():
+        if not User.objects.filter(id=user_id).exists():
+            raise ValueError("Cet utilisateur n'existe pas !")
+        elif user_id == request.user.id:
+            raise ValueError("Vous ne pouvez pas vous bloquer vous-même !")
+        user_to_block = User.objects.get(id=user_id)
+        request.user.profile.blocked.add(user_to_block.profile)
+        request.user.profile.follows.remove(user_to_block.profile)
+
+    return handle_action(
+        request,
+        action,
+        "Utilisateur bloqué avec succès !",
+        "Erreur lors du blocage de l'utilisateur.",
+        redirect_url="follows"
+    )
 
 
 @login_required
-def search_users(request):
+def unblock(request, user_id):
+    """
+    Débloque un utilisateur.
+
+    Args:
+        request (HttpRequest): L'objet de la requête HTTP.
+        user_id (str): L'identifiant de l'utilisateur à débloquer.
+
+    Returns:
+        HttpResponse: Redirige vers la page des abonnements après avoir débloqué
+        l'utilisateur.
+    """
+
+    user_id = int(user_id.split("_")[-1])
+
+    def action():
+        if not User.objects.filter(id=user_id).exists():
+            raise ValueError("Cet utilisateur n'existe pas !")
+        user_to_unblock = User.objects.get(id=user_id)
+        request.user.profile.blocked.remove(user_to_unblock.profile)
+
+    return handle_action(
+        request,
+        action,
+        "Utilisateur débloqué avec succès !",
+        "Erreur lors du déblocage de l'utilisateur.",
+        redirect_url="follows"
+    )
+
+
+@login_required
+def search_users(request: HttpRequest):
+    """
+    Recherche des utilisateurs dont le nom d'utilisateur
+    commence par une chaîne donnée.
+
+    Args:
+        request (HttpRequest): La requête HTTP contenant
+        les paramètres de recherche.
+
+    Returns:
+        JsonResponse: Une réponse JSON contenant une liste
+        des noms d'utilisateur correspondant à la recherche.
+    """
+
     if request.method == "GET":
-        username = request.GET.get('search', '')
-        users = User.objects.filter(username__startswith=username
-                                    ).exclude(id=request.user.id)
+        username = request.GET.get('search', '').strip()
+
+        if not username:
+            return JsonResponse({"users": []})
+
+        users = (
+            User.objects.filter(username__istartswith=username)
+            .exclude(id=request.user.id)
+            .order_by("username")[:5]
+        )
+
         return JsonResponse(
-            {"users": list(users.values("username"))}, safe=False)
+            {"users": list(users.values("username"))})
+
     return JsonResponse({}, safe=False)
 
 
 @login_required
-def create_ticket(request):
-    form = forms.TicketForm()
-    message = ""
+@clear_messages
+def create_ticket(request: HttpRequest):
+    """
+    Gère la création d'un ticket.
+
+    Si la méthode de la requête est POST :
+        - Valide le formulaire de création de ticket.
+
+    Si le formulaire est valide :
+        - Crée un ticket associé à l'utilisateur actuel et le sauvegarde.
+
+    Affiche un message de succès et redirige vers la page des posts.
+
+    Si la méthode de la requête n'est pas POST :
+        - Affiche un formulaire vide pour la création de ticket.
+
+    Args:
+        request (HttpRequest): L'objet de la requête HTTP.
+
+    Returns:
+        HttpResponse: La réponse HTTP avec le formulaire de création de ticket
+          ou une redirection.
+    """
 
     if request.method == "POST":
         form = forms.TicketForm(request.POST, request.FILES)
 
-        if form.is_valid():
-            ticket = form.save(commit=False)
-            ticket.user = request.user
-            ticket.save()
+        def action():
+            if form.is_valid():
+                ticket = form.save(commit=False)
+                ticket.user = request.user
+                ticket.save()
+            else:
+                raise ValueError("Erreur lors de la création du ticket.")
 
-            # Crée un ticket
-            message = "Ticket créé avec succès !"
-            return redirect("posts")
+        return handle_action(
+            request,
+            action,
+            "Ticket créé avec succès !",
+            "Erreur lors de la création du ticket.",
+            redirect_url="posts"
+        )
     else:
         form = forms.TicketForm()
 
@@ -163,123 +341,151 @@ def create_ticket(request):
         request,
         "website/create-ticket.html",
         context={
-            "form": form,
-            "message": message
+            "form": form
         }
     )
 
 
 @login_required
-def edit_ticket(request, ticket_id):
-    try:
-        ticket = Ticket.objects.get(id=ticket_id, user=request.user)
-    except Ticket.DoesNotExist:
+@clear_messages
+def edit_post(request, post_id, post_type):
+    """
+    Edite un post (ticket ou critique) existant.
+
+    Cette vue permet à un utilisateur de modifier un post (ticket ou critique)
+    qu'il a créé. Si le post n'existe pas ou si l'utilisateur n'a pas
+    l'autorisation d'y accéder :
+        - Un message d'erreur est affiché et l'utilisateur est redirigé
+        vers la page des posts.
+
+    Args:
+        request (HttpRequest): L'objet de la requête HTTP.
+        post_id (int): L'identifiant du post à modifier.
+        post_type (str): Le type du post à modifier ('ticket' ou 'review').
+
+    Returns:
+        HttpResponse: La réponse HTTP avec le formulaire de modification
+        du post ou une redirection.
+    """
+
+    post_model = Ticket if post_type == "ticket" else Review
+    post_query = post_model.objects.filter(id=post_id, user=request.user)
+    error_message = (
+        f"{post_type.capitalize()} introuvable ou accès non autorisé."
+    )
+    success_message = f"{post_type.capitalize()} modifié avec succès !"
+
+    if not post_query.exists():
+        messages.error(request, error_message)
         return redirect("posts")
 
-    message = ""
+    post = post_query.first()
 
     if request.method == "POST":
-        form = forms.TicketForm(request.POST, request.FILES, instance=ticket)
+        form = (
+            forms.TicketForm(request.POST, request.FILES, instance=post)
+            if post_type == "ticket"
+            else forms.ReviewForm(request.POST, instance=post)
+        )
 
         if form.is_valid():
             form.save()
-            message = "Post modifié avec succès !"
+            messages.success(request, success_message)
             return redirect("posts")
     else:
-        form = forms.TicketForm(instance=ticket)
+        form = (
+            forms.TicketForm(instance=post) if post_type == "ticket"
+            else forms.ReviewForm(instance=post)
+        )
+
+    template_name = (
+        "website/edit-ticket.html" if post_type == "ticket"
+        else "website/edit-review.html"
+    )
 
     return render(
         request,
-        "website/edit-ticket.html",
+        template_name,
         context={
             "form": form,
-            "message": message,
-            "ticket": ticket
+            "post": post
         }
     )
 
 
 @login_required
-def delete_ticket(request, ticket_id):
-    success = "Ticket supprimé avec succès !"
-    error = "Ce ticket n'existe pas ou vous n'avez pas la permission de le \
-            supprimer."
-    try:
-        ticket = Ticket.objects.get(id=ticket_id, user=request.user)
-        ticket.delete()
-        messages.success(request, success)
-    except Ticket.DoesNotExist:
-        messages.error(
-            request,
-            error
-            )
+def delete_post(request, post_id, post_type):
+    """
+    Supprime un post (ticket ou critique) existant.
 
-    return redirect("posts")
+    Args:
+        request (HttpRequest): L'objet de la requête HTTP.
+        post_id (int): L'identifiant du post à supprimer.
+        post_type (str): Le type du post à supprimer ('ticket' ou 'review').
 
+    Returns:
+        HttpResponse: Redirige vers la page des posts après la suppression
+        du post.
+    """
 
-@login_required
-def edit_review(request, review_id):
-    try:
-        review = Review.objects.get(id=review_id, user=request.user)
-    except Review.DoesNotExist:
-        return redirect("posts")
+    post_model = Ticket if post_type == "ticket" else Review
 
-    message = ""
+    def action():
+        post = post_model.objects.get(id=post_id, user=request.user)
+        post.delete()
 
-    if request.method == "POST":
-        form = forms.ReviewForm(request.POST, instance=review)
-
-        if form.is_valid():
-            form.save()
-            message = "Critique modifiée avec succès !"
-            return redirect("posts")
-    else:
-        form = forms.ReviewForm(instance=review)
-
-    return render(
+    return handle_action(
         request,
-        "website/edit-review.html",
-        context={
-            "form": form,
-            "message": message,
-            "review": review
-        }
-    )
-
-
-@login_required
-def delete_review(request, review_id):
-    success = "Critique supprimée avec succès !"
-    error = "Cette critique n'existe pas ou vous n'avez pas la permission\
-          de la supprimer."
-    try:
-        review = Review.objects.get(id=review_id, user=request.user)
-        review.delete()
-        messages.success(request, success)
-    except Review.DoesNotExist:
-        messages.error(
-            request,
-            error
-            )
-
-    return redirect("posts")
+        action,
+        f"{post_type.capitalize()} supprimé avec succès !",
+        f"{post_type.capitalize()} introuvable ou accès non autorisé.",
+        redirect_url="posts"
+        )
 
 
 @login_required
 def posts(request):
-    user_tickets = Ticket.objects.filter(user=request.user
-                                         ).order_by("-time_created")
-    user_reviews = Review.objects.filter(user=request.user
-                                         ).order_by("-time_created")
-    posts = list(user_tickets) + list(user_reviews)
+    """
+    Gère l'affichage des posts de l'utilisateur connecté.
 
-    for ticket in user_tickets:
-        ticket.is_ticket = True
-    for review in user_reviews:
-        review.is_ticket = False
-        review.title = review.headline
+    Cette vue récupère les tickets et les critiques créés par l'utilisateur,
+    les combine, les trie par date de création décroissante et les passe au
+    template pour affichage.
 
-    user_posts = sorted(posts, key=lambda x: x.time_created, reverse=True)
+    Args:
+        request (HttpRequest): L'objet de requête HTTP.
+
+    Returns:
+        HttpResponse: La réponse HTTP avec le template 'website/posts.html'
+        et le contexte contenant les posts de l'utilisateur.
+
+    Contexte:
+        posts (list): Liste des tickets et critiques de l'utilisateur,
+        triée par date de création décroissante.
+    """
+
+    tickets = (
+        Ticket.objects.filter(user=request.user)
+        .annotate(is_ticket=Value(True, output_field=BooleanField()))
+        .select_related("user")
+        .order_by("-time_created")
+        )
+
+    reviews = (
+        Review.objects.filter(user=request.user)
+        .annotate(
+            is_ticket=Value(False, output_field=BooleanField()),
+            title=F("headline")
+            )
+        .select_related("user", "ticket")
+        .order_by("-time_created")
+    )
+
+    user_posts = sorted(
+        chain(tickets, reviews),
+        key=lambda x: x.time_created,
+        reverse=True
+    )
 
     return render(
         request,
@@ -291,10 +497,26 @@ def posts(request):
 
 
 @login_required
+@clear_messages
 def create_standalone_review(request):
-    ticket_form = forms.TicketForm()
-    review_form = forms.ReviewForm()
-    message = ""
+    """
+    Vue pour créer une critique indépendante avec un ticket associé.
+
+    Cette vue gère la création d'un ticket et d'une critique associée
+    lorsque la méthode de requête est POST.
+    Si les formulaires de ticket et de critique sont valides,
+    le ticket et la critique sont enregistrés dans la base de données.
+    En cas d'erreur de validation, des messages d'erreur sont affichés
+    et le ticket est supprimé si la critique n'est pas valide.
+
+    Args:
+        request (HttpRequest): L'objet de la requête HTTP.
+
+    Returns:
+        HttpResponse: Redirige vers "flux" en cas de succès ou d'erreur,
+        ou rend le template "create-std-review.html" avec les formulaires
+        et les messages d'erreur.
+    """
 
     if request.method == "POST":
         ticket_form = forms.TicketForm(request.POST, request.FILES)
@@ -311,30 +533,61 @@ def create_standalone_review(request):
                 review.user = request.user
                 review.save()
 
-                message = "Critique créée avec succès !"
+                messages.success(request, "Critique créée avec succès !")
                 return redirect("flux")
             else:
                 ticket.delete()
-                message = "Erreur lors de la création de la critique."
+                messages.error(
+                    request, "Erreur lors de la création de la critique."
+                    )
         else:
-            message = "Erreur lors de la création du ticket."
+            messages.error(request, "Erreur lors de la création du ticket.")
+    else:
+        ticket_form = forms.TicketForm()
+        review_form = forms.ReviewForm()
 
     return render(
         request,
         "website/create-std-review.html",
         context={
             "ticket_form": ticket_form,
-            "review_form": review_form,
-            "message": message
+            "review_form": review_form
         }
     )
 
 
 @login_required
+@clear_messages
 def create_related_review(request, ticket_id):
+    """
+    Vue pour créer une critique liée à un ticket existant.
+
+    Cette vue gère la création d'une critique pour un ticket existant.
+
+    Si la méthode de la requête est POST, elle tente de valider et
+    de sauvegarder le formulaire de critique.
+
+    En cas de succès, elle redirige vers la page "flux" avec
+    un message de succès.
+
+    En cas d'erreur de validation du formulaire, elle affiche
+    un message d'erreur.
+
+    Si la méthode de la requête n'est pas POST, elle redirige également
+    vers la page "flux" avec un message d'erreur.
+
+    Args:
+        request (HttpRequest): L'objet de la requête HTTP.
+        ticket_id (int): L'identifiant du ticket auquel la critique est liée.
+
+    Returns:
+        HttpResponse: Redirige vers la page "flux" en cas de succès
+        ou d'erreur.
+        HttpResponse: Rend la page de création de critique avec le formulaire
+        en cas de méthode GET.
+    """
+
     ticket = Ticket.objects.get(id=ticket_id)
-    review_form = forms.ReviewForm()
-    message = ""
 
     if request.method == "POST":
         review_form = forms.ReviewForm(request.POST)
@@ -345,17 +598,20 @@ def create_related_review(request, ticket_id):
             review.user = request.user
             review.save()
 
-            message = "Critique créée avec succès !"
+            messages.success(request, "Critique créée avec succès !")
             return redirect("flux")
         else:
-            message = "Erreur lors de la création de la critique"
+            messages.error(
+                request, "Erreur lors de la création de la critique"
+                )
+    else:
+        review_form = forms.ReviewForm()
 
     return render(
         request,
         "website/create-rel-review.html",
         context={
             "ticket": ticket,
-            "review_form": review_form,
-            "message": message
+            "review_form": review_form
         }
     )

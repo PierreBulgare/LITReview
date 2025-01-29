@@ -1,8 +1,7 @@
 {% extends "base.html" %}
-{% block title %} | Modifier un ticket{% endblock title %}
-{% block page_name %}Modifier un ticket{% endblock page_name %}
+{% block title %} | Modifier une critique{% endblock title %}
+{% block page_name %}Modifier une critique{% endblock page_name %}
 {% block main_content %}<div>
-    <p>Modifier un ticket</p>
     <p>{{ message }}</p>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load custom_filters %}
+{% block title %}Vos posts{% endblock title %}
 {% block page_name %}Vos posts{% endblock page_name %}
 {% block main_content %}
 <div>
@@ -55,11 +56,11 @@
                 {% endif %}
                 <p class="ticket-buttons">
                     {% if post.is_ticket %}
-                        <a href="{% url 'edit_ticket' post.id %}" class="button">Modifier</a>
-                        <a href="{% url 'delete_ticket' post.id %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
+                        <a href="{% url 'edit_ticket' post.id 'ticket' %}" class="button">Modifier</a>
+                        <a href="{% url 'delete_ticket' post.id 'ticket' %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
                     {% else %}
-                        <a href="{% url 'edit_review' post.id %}" class="button">Modifier</a>
-                        <a href="{% url 'delete_review' post.id %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
+                        <a href="{% url 'edit_review' post.id 'review' %}" class="button">Modifier</a>
+                        <a href="{% url 'delete_review' post.id 'review' %}" class="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
                     {% endif %}
                 </p>
             </div>

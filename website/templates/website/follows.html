@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %} | Abonnements{% endblock title %}
+{% block title %}Abonnements{% endblock title %}
 {% block page_name %}Onglet d'abonnements{% endblock page_name %}
 {% block main_content %}
 <div>
@@ -21,15 +21,36 @@
     {% endif %}
     <h2>Abonnements</h2>
     <div class="follows-list">
-        {% for followed_user in followed_users %}
-            <p>👤 {{ followed_user }}<a href="../unfollow/user_{{ followed_user.user_id }}/" class="button">❌ Désabonner</a></p>
+        {% for user in following %}
+            {%if user not in blocked_users %}
+                <div>👤 {{ user }}
+                    <p class="follows-options">
+                        <a href="../block/user_{{ user.user_id }}/" class="button">🚫 Bloquer</a>
+                        <a href="../unfollow/user_{{ user.user_id }}/" class="button">❌ Désabonner</a>
+                    </p>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
     <h2>Abonnés</h2>
     <div class="follows-list">
         {% for follower in followers %}
-            <p>👤 {{ follower }}</p>
+            {%if follower not in blocked_users %}
+                <div>👤 {{ follower }}
+                    <p class="follows-options">
+                        <a href="../block/user_{{ follower.user_id }}/" class="button">🚫 Bloquer</a>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
+    <h2>Utilisateurs bloqués</h2>
+    <div class="follows-list">
+        {% for blocked in blocked_users %}
+            <div>👤 {{ blocked }}
+                <p class="follows-options">
+                    <a href="../unblock/user_{{ blocked.user_id }}/" class="button">🔓 Débloquer</a>
+                </p>
+            </div>
+        {% endfor %}
 </div>
 {% endblock main_content %}

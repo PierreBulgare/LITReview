@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="LIT Review">
-        <title>LIT Review{% block title %}{% endblock title %}</title>
+        <title>LIT Review | {% block title %}{% endblock title %}</title>
         <link rel="stylesheet" href="{% static 'styles.css' %}">
         <script type="text/javascript" src="{% static 'scripts.js' %}"></script>
         <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
@@ -17,13 +17,15 @@
                 <span class="bold-element">👤 {{ user.username }}</span>
                 {% endif %}
                 <h1>📖 LIT Review 📖</h1>
-                <nav>
+                <nav aria-label="Menu principal">
                     <ul>
                         {% if user.is_authenticated %}
-                        <li><a href="{% url 'flux' %}">📰 Flux</a></li>
-                        <li><a href="{% url 'posts' %}">📃 Posts</a></li>
-                        <li><a href="{% url 'follows' %}">👥 Abonnements</a></li>
-                        <li><a href="{% url 'logout' %}">❌ Se déconnecter</a></li>
+                            <li><a href="{% url 'flux' %}">📰 Flux</a></li>
+                            <li><a href="{% url 'posts' %}">📃 Posts</a></li>
+                            <li><a href="{% url 'follows' %}">👥 Abonnements</a></li>
+                            <li><a href="{% url 'logout' %}">❌ Se déconnecter</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">🔑 Se connecter</a></li>
                         {% endif %}
                     </ul>
                 </nav>
@@ -37,7 +39,7 @@
         </main>
         {% endblock main %}
         {% block footer %}
-        <footer></footer>
+        <footer><p>&copy; 2025 LIT Review. Tous droits réservés.</p></footer>
         {% endblock footer %}
     </body>
 </html>
