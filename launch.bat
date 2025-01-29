@@ -52,7 +52,10 @@ IF NOT EXIST "manage.py" (
 
 REM Lance le serveur
 echo [INFO] Lancement du programme...
-python manage.py runserver
+start python manage.py runserver
+
+REM Timeout pour laisser le temps au serveur de démarrer
+timeout /T 3 /NOBREAK >nul
 
 REM Ouverture du navigateur
 echo [INFO] Ouverture de l'application sur le navigateur...
