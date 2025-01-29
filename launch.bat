@@ -45,14 +45,14 @@ IF ERRORLEVEL 1 (
 
 REM Vérifie si manage.py existe dans le répertoire
 IF NOT EXIST "manage.py" (
-    echo [ERREUR] Le fichier main.py est introuvable.
+    echo [ERREUR] Le fichier manage.py est introuvable.
     pause
     exit /b
 )
 
 REM Lance le serveur
 echo [INFO] Lancement du programme...
-python manage.pu runserver
+python manage.py runserver
 
 REM Ouverture du navigateur
 echo [INFO] Ouverture de l'application sur le navigateur...

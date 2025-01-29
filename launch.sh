@@ -45,7 +45,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Vérifie si manage.py existe avant de l'exécuter
-if [ ! -f "main.py" ]; then
+if [ ! -f "manage.py" ]; then
     echo "[ERREUR] Le fichier manage.py est introuvable."
     deactivate
     exit 1
