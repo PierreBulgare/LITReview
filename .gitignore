@@ -1,4 +1,4 @@
 # Dossiers
-env/
+migrations/
 __pycache__/
-flake8-report/
+env/
